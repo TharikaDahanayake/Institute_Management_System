@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Management</title>
+    <style>
+         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            height: 100vh;
+            background-color: white; 
+            background-size: cover;
+            color:#010048;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            background-color: white;
+            
+        }
+
+        .left, .right {
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .left {
+            width: 38%;
+            border: 5px solid #012652; 
+        }
+
+        .right {
+            width: 60%;
+            border: 5px solid #012652; 
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: url("C:/Users/thari/Downloads/depositphotos_41723613-stock-photo-abstract-background-blue-colour.jpg");
+            color: white;
+        }
+        td {
+            background-color: #f3f6f4;
+            color: black;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-actions .save-btn,
+        .form-actions .clear-btn {
+            background-color: #010048;
+            color: white;
+        }
+
+        .search-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-group input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .search-group button {
+            width: 90px;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            background-color: #010048;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-group select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="left">
+            <h2>Create Subject</h2>
+            
+            <div class="form-group">
+                <label for="subjectId">Subject ID:</label>
+                <input type="text" id="subjectId" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="subjectName">Subject Name:</label>
+                <input type="text" id="subjectName" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="stream">Stream:</label>
+                <select id="stream">
+                    <option value="Select stream">Select Stream</option>
+                    <option value="Science stream">Science stream</option>
+                    <option value="Commerce stream">Commerce stream</option>
+                    <option value="Arts stream">Arts stream</option>
+                    <option value="Technology stream">Technology stream</option>
+                    <option value="Physical Science stream">Physical Science stream</option>
+                    <option value="Maths stream">Maths stream</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="clear-btn" id="clear-btn" onclick="clearForm()">Clear</button>
+                <button type="button" class="save-btn" id="save-btn" onclick="saveSubject()">Save</button>
+           
+            </div>
+        </div>
+    
+        <div class="right">
+            <h2>Subject Details</h2>
+            <div class="search-group">
+                <input type="text" id="searchSubjectId" placeholder="Enter Subject ID to search" autocomplete="off">
+                <button onclick="searchSubject()">Search</button>
+                <button onclick="resetSearch()">Reset</button>
+            </div>
+            <div style="overflow-y: auto; max-height: 400px;"> <!-- Added scrollable div -->
+                <table id="subjectTable">
+                    <thead>
+                        <tr>
+                            <th>Subject ID</th>
+                            <th>Subject Name</th>
+                            <th>Stream</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectTableBody">
+                    <!-- Data will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, query, where, collection, addDoc, updateDoc, doc, getDoc, getDocs, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+            authDomain: "admin-website-cc58a.firebaseapp.com",
+            projectId: "admin-website-cc58a",
+            storageBucket: "admin-website-cc58a.appspot.com",
+            messagingSenderId: "1038815370367",
+            appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+    
+        function clearForm() {
+            document.getElementById('subjectId').value = '';
+            document.getElementById('subjectName').value = '';
+            document.getElementById('stream').value = '';
+            document.getElementById('searchSubjectId').value = '';
+        }
+        window.clearForm = clearForm;
+    
+        async function updateSubject() {
+            const subjectId = document.getElementById('subjectId').value.trim();
+            const subjectName = document.getElementById('subjectName').value.trim();
+            const stream = document.getElementById('stream').value.trim();
+    
+            if (!subjectId || !subjectName || !stream) {
+                alert("Please fill in all fields.");
+                return;
+            }
+    
+            try {
+                const q = query(collection(db, "subjects"), where("SubjectID", "==", subjectId));
+                const querySnapshot = await getDocs(q);
+    
+                if (!querySnapshot.empty) {
+                    const docRef = querySnapshot.docs[0].ref;
+    
+                    await updateDoc(docRef, {
+                        SubjectName: subjectName,
+                        Stream: stream
+                    });
+    
+                    alert("Subject updated successfully!");
+                    clearForm();
+                    loadSubjects();
+                } else {
+                    alert("Subject not found!");
+                }
+            } catch (error) {
+                console.error("Error updating subject: ", error);
+            }
+        }
+        window.updateSubject = updateSubject;
+    
+        async function deleteSubject(subjectId) {
+            if (confirm(`Are you sure you want to delete Subject ID: ${subjectId}?`)) {
+                try {
+                    const q = query(collection(db, "subjects"), where("SubjectID", "==", subjectId));
+                    const querySnapshot = await getDocs(q);
+    
+                    if (!querySnapshot.empty) {
+                        const docRef = querySnapshot.docs[0].ref;
+                        await deleteDoc(docRef);
+    
+                        alert("Subject deleted successfully!");
+                        loadSubjects(); // Reload subjects after deletion
+                    } else {
+                        alert("Subject not found!");
+                    }
+                } catch (error) {
+                    console.error("Error deleting subject: ", error);
+                }
+            }
+        }
+        window.deleteSubject = deleteSubject;
+    
+        async function loadSubjects() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "subjects"));
+                const subjectTableBody = document.getElementById('subjectTableBody');
+                subjectTableBody.innerHTML = '';
+    
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${data.SubjectID}</td>
+                        <td>${data.SubjectName}</td>
+                        <td>${data.Stream}</td>
+                        <td><button class="delete-btn" onclick="deleteSubject('${data.SubjectID}')">Delete</button></td>
+                    `;
+                    subjectTableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error loading subjects: ", error);
+            }
+        }
+    
+        async function searchSubject() {
+            const subjectId = document.getElementById('searchSubjectId').value.trim();
+            if (!subjectId) {
+                alert("Please enter a Subject ID to search.");
+                return;
+            }
+    
+            try {
+                const q = query(collection(db, "subjects"), where("SubjectID", "==", subjectId));
+                const querySnapshot = await getDocs(q);
+    
+                const subjectTableBody = document.getElementById('subjectTableBody');
+                subjectTableBody.innerHTML = ''; // Clear existing rows
+    
+                if (!querySnapshot.empty) {
+                    const subject = querySnapshot.docs[0].data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${subject.SubjectID}</td>
+                        <td>${subject.SubjectName}</td>
+                        <td>${subject.Stream}</td>
+                        <td><button class="delete-btn" onclick="deleteSubject('${subject.SubjectID}')">Delete</button></td>
+                    `;
+                    subjectTableBody.appendChild(row);
+                } else {
+                    alert("Subject not found!");
+                }
+            } catch (error) {
+                console.error("Error searching subject: ", error);
+            }
+        }
+        window.searchSubject = searchSubject;
+    
+        async function resetSearch() {
+            document.getElementById('searchSubjectId').value = '';
+            await loadSubjects(); // Reload all subjects
+        }
+        window.resetSearch = resetSearch;
+    
+        async function saveSubject() {
+            const subjectId = document.getElementById('subjectId').value.trim();
+            const subjectName = document.getElementById('subjectName').value.trim();
+            const stream = document.getElementById('stream').value.trim();
+    
+            if (!subjectId || !subjectName || !stream) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            // Validation for subject ID format
+            const subjectIdRegex = /^S\d{3}$/; // "S" followed by exactly 3 digits
+            if (!subjectIdRegex.test(subjectId)) {
+                alert("Subject ID must start with 'S' followed by 3 digits (e.g., S001).");
+                return;
+            }
+    
+            try {
+                const subjectRef = doc(db, "subjects", subjectId);
+                const docSnap = await getDoc(subjectRef);
+    
+                if (docSnap.exists()) {
+            // If subject ID already exists, display an error message
+            alert("Subject ID already exists. Please choose a different Subject ID.");
+                } else {
+                    // Subject does not exist, create a new one
+                    await setDoc(subjectRef, {
+                        SubjectID: subjectId,
+                        SubjectName: subjectName,
+                        Stream: stream
+                    });
+                    alert("Subject added successfully!");
+                }
+    
+                clearForm(); // Clear the form after saving
+                loadSubjects(); // Reload subjects to reflect the changes
+            } catch (error) {
+                console.error("Error saving subject: ", error);
+            }
+        }
+        window.saveSubject = saveSubject;
+    
+        window.onload = loadSubjects;
+    </script>
+</body>
+</html>

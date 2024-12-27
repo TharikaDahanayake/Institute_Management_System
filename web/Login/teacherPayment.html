@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Payment Details</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background-color: white; 
+            color: #010048;
+            font-weight: bold;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: url("C:/Users/thari/Downloads/depositphotos_41723613-stock-photo-abstract-background-blue-colour.jpg");
+            color: white;
+        }
+        td {
+            background-color: #f3f6f4;
+            color: black;
+        }
+        .form-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid #f1f1f1;
+            z-index: 9;
+            padding: 20px;
+            background-color: white;
+            width: 400px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-container label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .form-container input,
+        .form-container select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #010048;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #012652;
+        }
+        .close-button {
+            background-color: #dc3545;
+        }
+        .close-button:hover {
+            background-color: #c82333;
+        }
+        .action-button {
+            padding: 8px 12px;
+            background-color: #010048;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .action-button:hover {
+            background-color: #012652;
+        }
+        .add-payment-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #010048; /* Green background */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px; /* Icon size */
+        }
+        .add-payment-button:hover {
+            background-color: #010048; /* Darker green */
+        }
+
+    </style>
+</head>
+<body>
+    <center><h2><b>Teacher Payment Records</b></h2></center><br>
+    <table>
+        <thead>
+            <tr>
+                <th>Payment ID</th>
+                <th>Class ID</th>
+                <th>Teacher ID</th>
+                <th>Month</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="paymentTableBody">
+            <!-- Rows will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <!-- Pop-up Form to View and Edit Details -->
+    <div class="form-popup" id="paymentDetailPopup">
+        <form id="paymentDetailForm" class="form-container">
+            <label for="paymentID">Payment ID:</label>
+            <input type="text" id="paymentID" name="paymentID" readonly> 
+
+            <label for="teacherID">Teacher ID:</label>
+            <input type="text" id="teacherID" name="teacherID" readonly>
+
+            <label for="classID">Class ID:</label>
+            <input type="text" id="classID" name="classID" readonly>
+
+            <label for="month">Month:</label>
+            <input type="text" id="month" name="month">
+
+            <label for="date">Date:</label>
+            <input type="text" id="date" name="date">
+
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount">
+
+            <label for="status">Status:</label>
+            <input type="text" id="status" name="status">
+
+            <button type="button" class="close-button" onclick="closePopup()">Close</button>
+            <button type="button" class="action-button" onclick="updatePaymentDetails()">Update</button>
+        </form>
+    </div>
+     <!-- Pop-up Form to Add Payment Details -->
+     <div class="form-popup" id="addPaymentPopup">
+        <form id="addPaymentForm" class="form-container">
+            <div class="form-group">
+                <label for="newPaymentID">Payment ID:</label>
+                <input type="text" id="newPaymentID" name="newPaymentID" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="TeacherID">Teacher ID:</label>
+                <select id="teacherId" name="TeacherID" required>
+                    <option value="">Select TeacherID</option>
+                </select>
+            </div>
+        
+            <div class="form-group">
+                <label for="classId">Class ID:</label>
+                <select id="classId" name="classId" required>
+                    <option value="">Select Class ID</option>
+                </select>
+            </div>
+        
+            <div class="form-group">
+                <label for="newMonth">Month:</label>
+                <input type="text" id="newMonth" name="newMonth" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="newDate">Date:</label>
+                <input type="text" id="newDate" name="newDate" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="newAmount">Amount:</label>
+                <input type="number" id="newAmount" name="newAmount" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="newStatus">Status:</label>
+                <input type="text" id="newStatus" name="newStatus" required>
+            </div>
+        
+            <div class="form-buttons">
+                <button type="button" class="close-button" onclick="closeAddPopup()">Close</button>
+                <button type="button" class="action-button" onclick="savePaymentDetails()">Save</button>
+            </div>
+        </form>
+        
+    </div>
+
+    <button class="add-payment-button" onclick="openAddPaymentPopup()">+</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc , addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+            authDomain: "admin-website-cc58a.firebaseapp.com",
+            projectId: "admin-website-cc58a",
+            storageBucket: "admin-website-cc58a.appspot.com",
+            messagingSenderId: "1038815370367",
+            appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to load teacher payments into the table
+        async function loadTeacherPayments() {
+            try {
+                const paymentQuery = collection(db, 'teacherPayment'); 
+                const querySnapshot = await getDocs(paymentQuery);
+                const tableBody = document.getElementById('paymentTableBody');
+                tableBody.innerHTML = ''; // Clear the table before loading new data
+
+                querySnapshot.forEach(doc => {
+                    const paymentData = doc.data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = 
+                        `<td>${paymentData.paymentID}</td>
+                         <td>${paymentData.classID}</td>
+                         <td>${paymentData.teacherID}</td>
+                         <td>${paymentData.month}</td>
+                         <td>${paymentData.amount}</td>
+                         <td>${paymentData.date}</td>
+                         <td>${paymentData.status}</td>
+                         <td><button class="action-button" data-id="${doc.id}">View Details</button></td>`; // Use doc.id for the payment ID
+                    tableBody.appendChild(row);
+                });
+
+                // Add event listeners to view buttons
+                const viewButtons = document.querySelectorAll('.action-button[data-id]');
+                viewButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const paymentID = button.getAttribute('data-id');
+                        viewPaymentDetails(paymentID);
+                    });
+                });
+            } catch (error) {
+                console.error("Error loading payment data: ", error);
+            }
+        }
+
+        async function loadteachers() {
+        try {
+            const teachersCollection = collection(db, 'teachers');
+            const querySnapshot = await getDocs(teachersCollection);
+            const teacherSelect = document.getElementById('teacherId');
+
+            querySnapshot.forEach(doc => {
+                const teacherData = doc.data();
+                const option = document.createElement('option');
+                option.value = teacherData.teacherID;
+                option.textContent = teacherData.teacherID;
+                teacherSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading teachers:', error);
+        }
+    }
+
+    async function populateTeacherID() {
+        const teacherIdSelect = document.getElementById('teacherId');
+        teacherIdSelect.innerHTML = '<option value="">Select Teacher ID</option>';
+
+        try {
+            const querySnapshot = await getDocs(collection(db, "teachers"));
+            querySnapshot.forEach((doc) => {
+                const teacherId = doc.data().teacherID;
+                const option = document.createElement("option");
+                option.value = teacherId;
+                option.textContent = teacherId;
+                teacherIdSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error fetching teachers: ", error);
+        }
+    }
+    populateTeacherID();
+
+    async function loadClasses() {
+            try {
+                const classCollection = collection(db, 'classes');
+                const querySnapshot = await getDocs(classCollection);
+                const classSelect = document.getElementById('classId');
+
+                querySnapshot.forEach(doc => {
+                    const classData = doc.data();
+                    const option = document.createElement('option');
+                    option.value = classData.classId;
+                    option.textContent = classData.classId;
+                    classSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading classes:', error);
+            }
+        }
+
+        loadClasses();
+
+
+
+        // Function to view payment details in the popup form
+        async function viewPaymentDetails(paymentID) {
+            try {
+                const paymentDocRef = doc(db, 'teacherPayment', paymentID);
+                const paymentDoc = await getDoc(paymentDocRef);
+                if (paymentDoc.exists()) {
+                    const paymentData = paymentDoc.data();
+                    document.getElementById('paymentID').value = paymentData.paymentID;
+                    document.getElementById('teacherID').value = paymentData.teacherID;
+                    document.getElementById('classID').value = paymentData.classID;
+                    document.getElementById('month').value = paymentData.month;
+                    document.getElementById('date').value = paymentData.date;
+                    document.getElementById('amount').value = paymentData.amount;
+                    document.getElementById('status').value = paymentData.status;
+
+                    // Set the data attribute to the popup for the document ID
+                    document.getElementById('paymentDetailPopup').setAttribute('data-doc-id', paymentID);
+
+                    // Show the popup
+                    document.getElementById('paymentDetailPopup').style.display = 'block';
+                } else {
+                    console.error("No such document!");
+                }
+            } catch (error) {
+                console.error("Error fetching payment details: ", error);
+            }
+        }
+
+         function closePopup() {
+            document.getElementById('paymentDetailPopup').style.display = 'none';
+        }
+
+       
+        window.closePopup = function() {
+            document.getElementById('paymentDetailPopup').style.display = 'none';
+        }
+
+
+        window.updatePaymentDetails = async function() {
+            try {
+                const paymentID = document.getElementById('paymentDetailPopup').getAttribute('data-doc-id'); // Use the doc ID here
+                const month = document.getElementById('month').value;
+                const date = document.getElementById('date').value;
+                const amount = document.getElementById('amount').value;
+                const status = document.getElementById('status').value;
+
+                const paymentDocRef = doc(db, 'teacherPayment', paymentID);
+                await updateDoc(paymentDocRef, {
+                    month: month,
+                    date: date,
+                    amount: amount,
+                    status: status
+                });
+                alert("Payment details updated successfully!");
+                loadTeacherPayments(); // Reload the table to show updated data
+                closePopup();
+            } catch (error) {
+                console.error("Error updating payment details: ", error);
+            }
+        };
+         // Function to open the add payment popup
+         window.openAddPaymentPopup = function() {
+                document.getElementById('addPaymentPopup').style.display = 'block';
+                document.getElementById('overlay').style.display = 'block'; // Show overlay
+            };
+
+            // Function to close the add payment popup
+            window.closeAddPopup = function() {
+                document.getElementById('addPaymentPopup').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none'; // Hide overlay
+                document.getElementById('addPaymentForm').reset(); // Reset the form fields
+            };
+
+            // Function to close the payment details popup
+            window.closePopup = function() {
+                document.getElementById('paymentDetailPopup').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none'; // Hide overlay
+            };
+
+            function validatePaymentID(paymentID) {
+    const regex = /^P\d{3}$/;  // Regex to check if it starts with 'P' followed by 3 digits
+    return regex.test(paymentID);
+}
+        // Save payment details function
+        window.savePaymentDetails = async function() {
+    try {
+        const newPaymentID = document.getElementById('newPaymentID').value;
+        const newTeacherID = document.getElementById('teacherId').value;
+        const newClassID = document.getElementById('classId').value;
+        const newMonth = document.getElementById('newMonth').value;
+        const newDate = document.getElementById('newDate').value;
+        const newAmount = document.getElementById('newAmount').value;
+        const newStatus = document.getElementById('newStatus').value;
+
+         
+
+        // Add a new document in Firestore
+        await addDoc(collection(db, 'teacherPayment'), {
+            paymentID: newPaymentID,
+            teacherID: newTeacherID,
+            classID: newClassID,
+            month: newMonth,
+            date: newDate,
+            amount: newAmount,
+            status: newStatus
+        });
+        
+        alert("Payment details saved successfully!");
+        loadTeacherPayments(); // Reload the payment records to reflect the new entry
+        closeAddPopup(); // Close the add payment popup
+
+        // Clear the input fields
+        document.getElementById('newPaymentID').value = '';
+        document.getElementById('teacherId').value = '';
+        document.getElementById('classId').value = '';
+        document.getElementById('newMonth').value = '';
+        document.getElementById('newDate').value = '';
+        document.getElementById('newAmount').value = '';
+        document.getElementById('newStatus').value = '';
+    } catch (error) {
+        console.error("Error saving payment details: ", error);
+    }
+};
+
+// Function to close the add payment popup
+function closeAddPopup() {
+    document.getElementById('addPaymentPopup').style.display = 'none';
+}       
+
+        // Initial load of teacher payments
+        loadTeacherPayments();
+    </script>
+</body>
+</html>

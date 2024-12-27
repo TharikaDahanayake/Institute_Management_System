@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Details</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            color: #010048; /* Set text color */
+        }
+        .container {
+            width: 90%;
+            margin: 20px auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-container input[type="text"] {
+            padding: 8px;
+            border-radius: 4px 0 0 4px;
+            border: 1px solid #ddd;
+            width: 300px; /* Increased width of the search bar */
+        }
+        .search-container input[type="button"] {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #02006c; /* Set buttons to blue */
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .search-container input[type="button"]:hover {
+            background-color: #02006c; /* Darker blue on hover */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #010048;
+            color: white;
+        }
+        td {
+            background-color: #f3f6f4;
+            color: black;
+        }
+        .delete-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>All Parent Details</h2>
+    <div class="search-container">
+        <input type="text" id="searchStudentID" placeholder="Search by Student ID">
+        <input type="button" id="searchBtn" value="Search" class="search-button">
+        <input type="button" id="resetBtn" value="Reset" class="reset-button">
+    </div>
+    <table id="parentTable">
+        <thead>
+            <tr>
+                <th>StudentID</th>
+                <th>Parent NIC</th>
+                <th>Parent Name</th>
+                <th>Parent Tel</th>
+                <th>Parent Email</th>
+                <th>ParentID</th>
+                <th>Password</th>
+                
+            </tr>
+        </thead>
+        <tbody id="parentTableBody">
+            <!-- Data will be dynamically inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+        authDomain: "admin-website-cc58a.firebaseapp.com",
+        projectId: "admin-website-cc58a",
+        storageBucket: "admin-website-cc58a.appspot.com",
+        messagingSenderId: "1038815370367",
+        appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fetchParents(studentID = "") {
+        const parentsRef = collection(db, "studentRequests");
+        let q;
+
+        if (studentID) {
+            q = query(parentsRef, where("StudentID", "==", studentID));
+        } else {
+            q = parentsRef;
+        }
+
+        try {
+            const snapshot = await getDocs(q);
+            const tableBody = document.getElementById('parentTableBody');
+            tableBody.innerHTML = '';  // Clear table body before inserting
+
+            if (snapshot.empty) {
+                console.log("No matching documents.");
+                return;
+            }
+
+            snapshot.forEach(doc => {
+            const parent = doc.data();
+            // Skip entries with StudentID in the format "STUxxxxxxxxxxxxx"
+            if (/^STU\d{13}$/.test(parent.StudentID)) {
+                return;
+            }
+                // Display only if StudentID and Password are present
+                if (parent && parent.StudentID && parent.StudentPassword) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${parent.StudentID}</td>
+                        <td>${parent.ParentNIC}</td>
+                        <td>${parent.ParentName}</td>
+                        <td>${parent.ParentTelephone}</td>
+                        <td>${parent.ParentEmail}</td>
+                        <td>${parent.ParentID}</td>
+                        <td>${parent.ParentPassword}</td>
+                        
+                    `;
+                    tableBody.appendChild(row);
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching parent data:", error);
+            alert("An error occurred while fetching parent data.");
+        }
+    }
+
+    window.deleteParent = async function (parentID) {
+        if (confirm(`Are you sure you want to delete parent with ID: ${parentID}?`)) {
+            try {
+                await deleteDoc(doc(db, "studentRequests", parentID));
+                fetchParents(); // Refresh the parent list after deletion
+            } catch (error) {
+                console.error('Error deleting parent:', error);
+                alert('Failed to delete parent');
+            }
+        }
+    };
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+        const studentID = document.getElementById('searchStudentID').value.trim();
+        fetchParents(studentID);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('searchStudentID').value = "";
+        fetchParents();
+    });
+
+    document.addEventListener("DOMContentLoaded", () => fetchParents());
+</script>
+
+</body>
+</html>

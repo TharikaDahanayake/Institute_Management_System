@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Payment Details</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: white; 
+            background-size: cover;
+            color:  #010048; 
+            font-weight: bold;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px; /* Limit the container width */
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* Ensures equal column width */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            word-wrap: break-word; /* Forces content to wrap within cells */
+        }
+
+        th {
+            background: url("C:/Users/thari/Downloads/depositphotos_41723613-stock-photo-abstract-background-blue-colour.jpg");
+            color: white;
+        }
+
+        td {
+            background-color: #f3f6f4;
+            color: black;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .search-box input {
+            padding: 8px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .search-box button {
+            padding: 8px 12px;
+            background-color:  #010048;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background-color: #0056b3;
+        }
+
+        .reset-button {
+            background-color: #dc3545;
+        }
+
+        .reset-button:hover {
+            background-color: #c82333;
+        }
+
+        /* Scrollable container for the table */
+        .table-container {
+            max-height: 400px; /* Set the max height for vertical scrolling */
+            overflow-y: auto;  /* Enable vertical scroll */
+            overflow-x: auto;  /* Enable horizontal scroll */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <center><h2><b>Student Payment Details</b></h2></center><br>
+
+        <div class="search-box">
+            <input type="text" id="searchStudentID" placeholder="Enter Student ID">
+            <input type="text" id="searchClassID" placeholder="Enter Class ID">
+            <input type="text" id="searchMonth" placeholder="Enter Month">
+            <button id="searchButton">Search</button>
+            <button id="resetButton" class="reset-button">Reset</button>
+            <button id="generateReportButton">Generate Report</button>
+        </div>
+
+        <!-- Scrollable table container -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Class ID</th>
+                        <th>Month</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTableBody">
+                    <!-- Rows will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+            authDomain: "admin-website-cc58a.firebaseapp.com",
+            projectId: "admin-website-cc58a",
+            storageBucket: "admin-website-cc58a.appspot.com",
+            messagingSenderId: "1038815370367",
+            appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+
+        // Initialize Firebase and Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Load payments into table
+        async function loadPayments() {
+            try {
+                const paymentSnapshot = await getDocs(collection(db, 'payment'));
+                displayPayments(paymentSnapshot);
+            } catch (error) {
+                console.error("Error loading payments:", error);
+            }
+        }
+
+        // Function to display payments in the table
+        function displayPayments(paymentSnapshot) {
+            const tableBody = document.getElementById('paymentTableBody');
+            tableBody.innerHTML = ''; // Clear existing table data
+
+            paymentSnapshot.forEach(doc => {
+                const paymentData = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${paymentData.username}</td>
+                    <td>${paymentData.classId}</td>
+                    <td>${paymentData.month}</td>
+                    <td>${paymentData.paymentAmount}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Search for payment records by Student ID, Class ID, or Month
+        async function searchPayment() {
+            const studentID = document.getElementById('searchStudentID').value.trim();
+            const classID = document.getElementById('searchClassID').value.trim();
+            const month = document.getElementById('searchMonth').value.trim();
+
+            try {
+                let searchQuery = collection(db, "payment");
+                let constraints = [];
+
+                // Add constraints based on input
+                if (studentID) constraints.push(where("username", "==", studentID));
+                if (classID) constraints.push(where("classId", "==", classID));
+                if (month) constraints.push(where("month", "==", month));
+
+                if (constraints.length > 0) {
+                    searchQuery = query(searchQuery, ...constraints);
+                }
+
+                const querySnapshot = await getDocs(searchQuery);
+                const paymentTableBody = document.getElementById('paymentTableBody');
+                paymentTableBody.innerHTML = ''; // Clear existing table rows
+
+                if (!querySnapshot.empty) {
+                    displayPayments(querySnapshot);
+                } else {
+                    alert("No records found.");
+                }
+            } catch (error) {
+                console.error("Error searching payment:", error);
+            }
+        }
+
+        // Reset search fields and reload all payments
+        function resetForm() {
+            document.getElementById('searchStudentID').value = '';
+            document.getElementById('searchClassID').value = '';
+            document.getElementById('searchMonth').value = '';
+            loadPayments(); // Reload all payments
+        }
+
+        // Generate and download report as CSV
+        function generateReport() {
+            const rows = document.querySelectorAll("table tr");
+            let csvContent = "";
+
+            rows.forEach(row => {
+                const cols = row.querySelectorAll("td, th");
+                const rowData = Array.from(cols).map(col => col.innerText).join(",");
+                csvContent += rowData + "\n";
+            });
+
+            // Create a Blob and download the CSV file
+            const blob = new Blob([csvContent], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "payment_report.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Event listeners
+        document.getElementById('searchButton').addEventListener('click', searchPayment);
+        document.getElementById('resetButton').addEventListener('click', resetForm);
+        document.getElementById('generateReportButton').addEventListener('click', generateReport);
+
+        // Load the payments initially
+        loadPayments();
+    </script>
+
+</body>
+</html>

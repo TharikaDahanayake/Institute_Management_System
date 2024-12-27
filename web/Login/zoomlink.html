@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom Class Management</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            height: 100vh;
+            justify-content: space-between;
+            background-color: white; 
+            background-size: cover;
+            color:  #010048; /* Set text color to white */
+            font-weight: bold;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .form-container {
+            width: 32%;
+            padding: 20px;
+            border: 5px solid #012652; 
+        }
+        .form-container h2,
+        .form-container label {
+            color: #010048;
+            font-weight: bold;
+        }
+        .form-container input[type="text"],
+        .form-container input[type="date"],
+        .form-container input[type="time"],
+        .form-container select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-container button {
+            background-color: #010048;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .form-container button:hover {
+            background-color: #010048;
+        }
+       
+        .table-container {
+            width: 70%;
+            padding: 20px;
+            overflow-x: auto;
+            border: 5px solid #012652; 
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-container input[type="text"] {
+            width: 200px;
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .search-container button {
+            background-color: #010048;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .search-container button:hover {
+            background-color: #010048;
+        }
+        .delete-btn {
+            background-color: #cc0000;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: url("C:/Users/thari/Downloads/depositphotos_41723613-stock-photo-abstract-background-blue-colour.jpg");
+            color: white;
+        }
+        td {
+            background-color: #f3f6f4;
+            color: black;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2>Add Zoom Class Details</h2>
+            <div class="search-container">
+                <input type="text" id="searchZoomClassIDForm" placeholder="Search by Zoom Class ID">
+                <button onclick="searchAndPopulateForm()">Search</button>
+                <button onclick="resetSearchForm()">Reset</button>
+            </div>
+            
+            <form onsubmit="event.preventDefault(); saveZoom();">
+                <label for="zoomClassID">Zoom Class ID</label>
+                <input type="text" id="zoomClassID" name="zoomClassID" required>
+
+                <label for="classId">Class ID:</label>
+                <select id="classId" name="classId" required>
+                    <option value="">Select Class ID</option>
+                </select>
+
+                <label for="meetingLink">Meeting Link</label>
+                <input type="text" id="meetingLink" name="meetingLink" required>
+
+                <label for="meetingDate">Meeting Date</label>
+                <input type="date" id="meetingDate" name="meetingDate" required>
+
+                <label for="meetingTime">Meeting Time</label>
+                <input type="time" id="meetingTime" name="meetingTime" required>
+
+                <button type="button" id="save-btn" class="save-btn" onclick="saveZoom()">Save</button>
+                <button type="button" onclick="updateZoomMeeting()">Update</button>
+            </form>
+        </div>
+        
+        <div class="table-container">
+            <h2>Zoom Class Details</h2>
+            <div class="search-container">
+                <input type="text" id="searchZoomClassID" placeholder="Search by Zoom Class ID">
+                <button onclick="searchZoom()">Search</button>
+                <button onclick="resetSearch()">Reset</button>
+                
+            </div>
+            
+            <table id="zoomClassTable">
+                <thead>
+                    <tr>
+                        <th>Zoom Class ID</th>
+                       
+                        <th>Meeting Date</th>
+                        <th>Meeting Time</th>
+                        <th>Meeting Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="zoomTableBody">
+                    <!-- Rows will be added here -->
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getFirestore, query, where, collection, setDoc, updateDoc, doc, getDocs, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+            authDomain: "admin-website-cc58a.firebaseapp.com",
+            projectId: "admin-website-cc58a",
+            storageBucket: "admin-website-cc58a.appspot.com",
+            messagingSenderId: "1038815370367",
+            appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.loadZoomMeetings = async function(searchID = "") {
+            try {
+                const zoomCollection = collection(db, 'zoomMeetings');
+                const querySnapshot = await getDocs(zoomCollection);
+                const tableBody = document.getElementById('zoomTableBody');
+                tableBody.innerHTML = '';
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (!searchID || data.ZoomClassID === searchID) {
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td>${data.ZoomClassID}</td>
+                               
+                                <td>${data.MeetingDate}</td>
+                                <td>${data.MeetingTime}</td>
+                                <td>${data.MeetingLink}</td>
+                                <td>
+                                    <button class="delete-btn"  onclick="window.deleteZoom('${data.ZoomClassID}')">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading Zoom meetings:', error);
+            }
+        };
+
+        async function loadClasses() {
+            try {
+                const classCollection = collection(db, 'classes');
+                const querySnapshot = await getDocs(classCollection);
+                const classSelect = document.getElementById('classId');
+
+                querySnapshot.forEach(doc => {
+                    const classData = doc.data();
+                    const option = document.createElement('option');
+                    option.value = classData.classId;
+                    option.textContent = classData.classId;
+                    classSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading classes:', error);
+            }
+        }
+
+        loadClasses();
+
+        window.saveZoom = async function() {
+            try {
+                const zoomClassID = document.getElementById('zoomClassID').value;
+                const classId = document.getElementById('classId').value;
+                const meetingLink = document.getElementById('meetingLink').value;
+                const meetingDate = document.getElementById('meetingDate').value;
+                const meetingTime = document.getElementById('meetingTime').value;
+
+                // Validate Zoom Class ID format (Z followed by 3 digits)
+        const zoomClassIDPattern = /^[C]\d{3}$/;
+        if (!zoomClassIDPattern.test(zoomClassID)) {
+            alert('Zoom Class ID must start with "C" followed by 3 digits.');
+            return;
+        }
+
+                if (!zoomClassID || !classId || !meetingLink || !meetingDate || !meetingTime) {
+                    alert('Please fill out all fields.');
+                    return;
+                }
+
+                await setDoc(doc(db, 'zoomMeetings', zoomClassID), {
+                    ZoomClassID: zoomClassID,
+                    ClassID: classId,
+                    MeetingLink: meetingLink,
+                    MeetingDate: meetingDate,
+                    MeetingTime: meetingTime
+                });
+
+                alert('Zoom class details saved successfully!');
+                loadZoomMeetings();
+            } catch (error) {
+                console.error('Error saving Zoom meeting:', error);
+            }
+        };
+
+        window.searchZoom = async function() {
+            const searchID = document.getElementById('searchZoomClassID').value;
+            loadZoomMeetings(searchID);
+        };
+
+        window.resetSearch = function() {
+            document.getElementById('searchZoomClassID').value = '';
+            loadZoomMeetings();
+        };
+
+        window.searchAndPopulateForm = async function() {
+            const searchID = document.getElementById('searchZoomClassIDForm').value;
+
+            try {
+                const zoomDocRef = doc(db, 'zoomMeetings', searchID);
+                const zoomDoc = await getDoc(zoomDocRef);
+
+                if (zoomDoc.exists()) {
+                    const data = zoomDoc.data();
+                    document.getElementById('zoomClassID').value = data.ZoomClassID;
+                    document.getElementById('classId').value = data.ClassID;
+                    document.getElementById('meetingLink').value = data.MeetingLink;
+                    document.getElementById('meetingDate').value = data.MeetingDate;
+                    document.getElementById('meetingTime').value = data.MeetingTime;
+                } else {
+                    alert('No matching Zoom class found.');
+                }
+            } catch (error) {
+                console.error('Error fetching Zoom class details:', error);
+            }
+        };
+
+        window.resetSearchForm = function() {
+            document.getElementById('searchZoomClassIDForm').value = '';
+            document.getElementById('zoomClassID').value = '';
+            document.getElementById('classId').value = '';
+            document.getElementById('meetingLink').value = '';
+            document.getElementById('meetingDate').value = '';
+            document.getElementById('meetingTime').value = '';
+        };
+
+        window.deleteZoom = async function(zoomClassID) {
+            try {
+                await deleteDoc(doc(db, 'zoomMeetings', zoomClassID));
+                alert('Zoom class deleted successfully!');
+                loadZoomMeetings();
+            } catch (error) {
+                console.error('Error deleting Zoom meeting:', error);
+            }
+        };
+
+        window.updateZoomMeeting = async function() {
+            try {
+                const zoomClassID = document.getElementById('zoomClassID').value;
+                const classId = document.getElementById('classId').value;
+                const meetingLink = document.getElementById('meetingLink').value;
+                const meetingDate = document.getElementById('meetingDate').value;
+                const meetingTime = document.getElementById('meetingTime').value;
+
+                if (!zoomClassID || !classId || !meetingLink || !meetingDate || !meetingTime) {
+                    alert('Please fill out all fields.');
+                    return;
+                }
+
+                const zoomDocRef = doc(db, 'zoomMeetings', zoomClassID);
+
+                await updateDoc(zoomDocRef, {
+                    ClassID: classId,
+                    MeetingLink: meetingLink,
+                    MeetingDate: meetingDate,
+                    MeetingTime: meetingTime
+                });
+
+                alert('Zoom class updated successfully!');
+                loadZoomMeetings();
+            } catch (error) {
+                console.error('Error updating Zoom meeting:', error);
+            }
+        };
+
+        window.onload = function() {
+            loadZoomMeetings();
+        };
+    </script>
+</body>
+</html>

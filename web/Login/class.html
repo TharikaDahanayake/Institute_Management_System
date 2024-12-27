@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #333;
+        }
+        .add-button {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+        .add-button button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #010048;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        table th {
+            background: url("C:/Users/thari/Downloads/depositphotos_41723613-stock-photo-abstract-background-blue-colour.jpg");
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            width: 50%;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .save-btn {
+            background-color: #010048;
+        }
+        .clear-btn {
+            background-color: #010048;
+        }
+        
+        .reset-btn {
+            background-color: #010048;
+        }
+        .search-bar {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-bar input[type="text"] {
+        width: 200px;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-right: 10px;
+    }
+
+    .search-bar button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        background-color: #010048;
+        color: white;
+        cursor: pointer;
+        margin-right: 5px;
+    }
+
+        button:hover {
+            opacity: 0.9;
+        }
+        .close-btn {
+            background-color: #f44336;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            padding: 5px 10px;
+        }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Class Management</h1>
+        </div>
+        <div class="add-button">
+            <button id="addBtn">+ Add New</button>
+        </div>
+        <table id="classTable">
+            <thead>
+                <tr>
+                    <th>Class ID</th>
+                    <th>Stream</th>
+                    <th>Subject ID</th>
+                    <th>Teacher ID</th>
+                    <th>Teacher Name</th>
+                    <th>Day</th>
+                    <th>Date</th>
+                    <th>Duration</th>
+                    <th>Introduction</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="classTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeBtn">X</button>
+            <form id="classForm">
+                <div class="search-bar">
+                    <input type="text" id="searchClassIdLeft" placeholder="Search by Class ID">
+                    <button onclick="searchClassById()">Search</button>
+                    <button onclick="resetSearchForm1()">Reset</button>
+                    
+                </div>
+        
+                <div class="form-group">
+                    <label for="classId">Class ID</label>
+                    <input type="text" id="classId" placeholder="Enter Class ID" required>
+                </div>
+                <div class="form-group">
+                    <label for="Stream">Stream</label>
+                    <select id="Stream"></select>
+                </div>
+                <div class="form-group">
+                    <label for="SubjectID">Subject ID</label>
+                    <select id="SubjectID"></select>
+                </div>
+                <div class="form-group">
+                    <label for="teacherId">Teacher ID</label>
+                    <select id="teacherId"></select>
+                </div>
+                <div class="form-group">
+                    <label for="fname">Teacher Name</label>
+                    <input type="text" id="fname" placeholder="Enter Teacher Name">
+                </div>
+                <div class="form-group">
+                    <label for="day">Day</label>
+                    <input type="text" id="day" placeholder="Enter Day">
+                </div>
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date">
+                </div>
+                <div class="form-group">
+                    <label for="duration">Duration</label>
+                    <input type="text" id="duration" placeholder="Enter Duration">
+                </div>
+                <div class="form-group">
+                    <label for="introduction">Introduction</label>
+                    <input type="text" id="introduction" placeholder="Enter Introduction">
+                </div>
+                <div class="button-group">
+                    <button type="button" class="clear-btn" id="clear-btn" onclick="clearForm()">Clear</button>
+                    <button type="button"  class="save-btn" onclick="saveClass ()">Save</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+            authDomain: "admin-website-cc58a.firebaseapp.com",
+            projectId: "admin-website-cc58a",
+            storageBucket: "admin-website-cc58a.appspot.com",
+            messagingSenderId: "1038815370367",
+            appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadClasses() {
+            const classesRef = collection(db, "classes");
+            const snapshot = await getDocs(classesRef);
+            const tableBody = document.getElementById("classTableBody");
+            tableBody.innerHTML = "";
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const row = `
+                    <tr>
+                        <td>${data.classId}</td>
+                        <td>${data.stream}</td>
+                        <td>${data.subjectId}</td>
+                        <td>${data.teacherId}</td>
+                        <td>${data.fname}</td>
+                        <td>${data.day}</td>
+                        <td>${data.date}</td>
+                        <td>${data.duration}</td>
+                        <td>${data.introduction}</td>
+                        <td><button class="delete-btn" onclick="deleteClass('${doc.id}')">Delete</button></td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        };
+
+        async function loadsubjects() {
+        try {
+            const subjectsCollection = collection(db, 'subjects');
+            const querySnapshot = await getDocs(subjectsCollection);
+            const subjectSelect = document.getElementById('SubjectID');
+
+            querySnapshot.forEach(doc => {
+                const subjectData = doc.data();
+                const option = document.createElement('option');
+                option.value = subjectData.SubjectID;
+                option.textContent = subjectData.SubjectID;
+                subjectSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading subjects:', error);
+        }
+    }
+
+
+
+
+    async function populateSubjectID() {
+        const subjectIdSelect = document.getElementById('SubjectID');
+        subjectIdSelect.innerHTML = '<option value="">Select Subject ID</option>';
+
+        try {
+            const querySnapshot = await getDocs(collection(db, "subjects"));
+            querySnapshot.forEach((doc) => {
+                const subjectId = doc.data().SubjectID;
+                const option = document.createElement("option");
+                option.value = subjectId;
+                option.textContent = subjectId;
+                subjectIdSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error fetching subjects: ", error);
+        }
+    }
+    populateSubjectID();
+
+    async function loadteachers() {
+        try {
+            const teachersCollection = collection(db, 'teachers');
+            const querySnapshot = await getDocs(teachersCollection);
+            const teacherSelect = document.getElementById('teacherId');
+
+            querySnapshot.forEach(doc => {
+                const teacherData = doc.data();
+                const option = document.createElement('option');
+                option.value = teacherData.teacherID;
+                option.textContent = teacherData.teacherID;
+                teacherSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading teachers:', error);
+        }
+    }
+
+    async function populateTeacherID() {
+        const teacherIdSelect = document.getElementById('teacherId');
+        teacherIdSelect.innerHTML = '<option value="">Select Teacher ID</option>';
+
+        try {
+            const querySnapshot = await getDocs(collection(db, "teachers"));
+            querySnapshot.forEach((doc) => {
+                const teacherId = doc.data().teacherID;
+                const option = document.createElement("option");
+                option.value = teacherId;
+                option.textContent = teacherId;
+                teacherIdSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error fetching teachers: ", error);
+        }
+    }
+    populateTeacherID();
+
+    async function populateStream() {
+    const streamSelect = document.getElementById('Stream');
+    streamSelect.innerHTML = '<option value="">Select Stream</option>';
+
+    const streamsSet = new Set(); // Create a Set to track unique streams
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "subjects"));
+        querySnapshot.forEach((doc) => {
+            const stream = doc.data().Stream;
+            if (!streamsSet.has(stream)) { // Check if the stream is already added
+                streamsSet.add(stream); // Add the stream to the Set
+                const option = document.createElement("option");
+                option.value = stream;
+                option.textContent = stream;
+                streamSelect.appendChild(option);
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching subjects: ", error);
+    }
+}
+
+populateStream();
+
+window.searchAndPopulateForm = async function() {
+            const searchID = document.getElementById('searchZoomClassIDForm').value;
+
+            try {
+                const zoomDocRef = doc(db, 'zoomMeetings', searchID);
+                const zoomDoc = await getDoc(zoomDocRef);
+
+                if (zoomDoc.exists()) {
+                    const data = zoomDoc.data();
+                    document.getElementById('zoomClassID').value = data.ZoomClassID;
+                    document.getElementById('classId').value = data.ClassID;
+                    document.getElementById('meetingLink').value = data.MeetingLink;
+                    document.getElementById('meetingDate').value = data.MeetingDate;
+                    document.getElementById('meetingTime').value = data.MeetingTime;
+                } else {
+                    alert('No matching Zoom class found.');
+                }
+            } catch (error) {
+                console.error('Error fetching Zoom class details:', error);
+            }
+        };
+
+
+    window.searchClass = function() {
+        const classId = document.getElementById('searchClassId').value;
+        if (!classId) {
+            alert('Please enter a Class ID to search.');
+            return;
+        }
+        loadClasses(classId);
+    };
+
+    function clearForm() {
+        document.getElementById('searchClassIdLeft').value = '';
+        document.getElementById('classId').value = '';
+        document.getElementById('Stream').value = '';
+        document.getElementById('SubjectID').value = '';
+        document.getElementById('teacherId').value = '';
+        document.getElementById('fname').value = '';
+        document.getElementById('day').value = '';
+        document.getElementById('date').value = '';
+        document.getElementById('duration').value = '';
+        document.getElementById('introduction').value = '';
+        }
+        window.clearForm = clearForm;
+    
+
+
+    window.resetSearchForm1 = function() {
+        document.getElementById('searchClassIdLeft').value = '';
+        document.getElementById('classId').value = '';
+        document.getElementById('Stream').value = '';
+        document.getElementById('SubjectID').value = '';
+        document.getElementById('teacherId').value = '';
+        document.getElementById('fname').value = '';
+        document.getElementById('day').value = '';
+        document.getElementById('date').value = '';
+        document.getElementById('duration').value = '';
+        document.getElementById('introduction').value = '';
+    };
+
+    window.resetSearch = function() {
+        document.getElementById('searchClassId').value = '';
+        loadClasses();
+    };
+
+    window.saveClass = async function() {
+        event.preventDefault();
+    try {
+        // Get all input values and trim leading/trailing whitespace
+        const classId = document.getElementById('classId').value;
+        const stream = document.getElementById('Stream').value;
+        const subjectId = document.getElementById('SubjectID').value;
+        const teacherId = document.getElementById('teacherId').value;
+        const fname = document.getElementById('fname').value;
+        const day = document.getElementById('day').value;
+        const date = document.getElementById('date').value;
+        const duration = document.getElementById('duration').value;
+        const introduction = document.getElementById('introduction').value;
+
+        // Check if all fields are filled
+        if (!classId || !stream || !subjectId || !teacherId || !fname || !day || !date || !duration || !introduction) {
+            alert('Please fill all the fields to save the class.');
+            return;
+        }
+
+        // Validate classId: Must start with 'C' followed by exactly 3 digits
+        const classIdRegex = /^C\d{3}$/;
+        if (!classIdRegex.test(classId)) {
+            alert("Class ID must start with 'C' followed by exactly 3 digits (e.g., C001).");
+            return;
+        }
+
+        // Check if the class already exists
+        const classRef = doc(db, 'classes', classId);
+        const docSnap = await getDoc(classRef);
+
+        if (docSnap.exists()) {
+            // If class ID already exists, display an error message
+            alert("This Class ID is already registered. Please choose a different Class ID.");
+        } else {
+            // Create a new class object
+            const newClass = {
+                classId: classId,
+                    stream: stream,
+                    subjectId: subjectId ,
+                    teacherId: teacherId,
+                    fname: fname,
+                    day:day,
+                    date:date,
+                    duration:duration,
+                    introduction:introduction
+            };
+
+            // Save the new class to Firestore
+            await setDoc(classRef, newClass);
+
+            // Display success message
+            alert('Class registered successfully.');
+
+            // Reset the form or perform any other action as needed (e.g., clearing fields)
+            loadClasses();
+        }
+    } catch (error) {
+        console.error("Error saving class data: ", error);
+        alert("Please try again. An error occurred while saving the class.");
+    }
+};
+
+
+   
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadClasses();
+           
+    });
+
+
+
+    window.deleteClass = async function(classId) {
+        if (!confirm(`Are you sure you want to delete the class with ID ${classId}?`)) {
+            return;
+        }
+
+        try {
+            const docRef = doc(db, 'classes', classId);
+            await deleteDoc(docRef);
+            alert('Class deleted successfully.');
+            loadClasses();
+        } catch (error) {
+            console.error("Error deleting class data: ", error);
+        }
+    };
+
+
+
+        document.getElementById('addBtn').addEventListener('click', () => {
+            document.getElementById('modal').style.display = 'flex';
+        });
+
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            document.getElementById('modal').style.display = 'none';
+        });
+
+        document.getElementById('classForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const classId = document.getElementById('classId').value;
+            const stream = document.getElementById('Stream').value;
+            const subjectId = document.getElementById('SubjectID').value;
+            const teacherId = document.getElementById('teacherId').value;
+            const fname = document.getElementById('fname').value;
+            const day = document.getElementById('day').value;
+            const date = document.getElementById('date').value;
+            const duration = document.getElementById('duration').value;
+            const introduction = document.getElementById('introduction').value;
+
+            await setDoc(doc(db, "classes", classId), {
+                classId,
+                stream,
+                subjectId,
+                teacherId,
+                fname,
+                day,
+                date,
+                duration,
+                introduction
+            });
+
+            loadClasses();
+            document.getElementById('modal').style.display = 'none';
+        });
+        
+        loadClasses();
+    </script>
+</body>
+</html>

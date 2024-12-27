@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Student Details</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            background-size: cover;
+            color: #010048;
+        }
+        .container {
+            width: 90%;
+            margin: 20px auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: black;
+        }
+        #searchBar {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #060607;
+            color: black;
+        }
+        button {
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            background-color: #02006c;
+            color: white;
+        }
+        button:hover {
+            background-color: #004494;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 12px;
+            text-align: left;
+            color: black;
+        }
+        th {
+            background-color: #02006c;
+            color: white;
+        }
+        td {
+            background-color: #f3f6f4;
+        }
+        tr:hover {
+            background-color: #e0e0e0;
+            cursor: pointer;
+        }
+        .scroll-container {
+            display: block;
+            width: 100%;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .delete-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>All Student Details</h2>
+
+    <!-- Search Bar -->
+    <div id="searchBar">
+        <input type="text" id="searchStudentID" placeholder="Enter StudentID">
+        <button id="searchBtn">Search</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+
+    <div class="scroll-container">
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>StudentID</th>
+                    <th>Password</th>
+                    <th>StudentNIC</th>
+                    <th>FirstName</th>
+                    <th>LastName</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Address</th>
+                    <th>Stream</th>
+                    <th>School</th>
+                    <th>AcademicYear</th>
+                    <th>Email</th>
+                    <th>TelephoneNo</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                <!-- Data will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+        authDomain: "admin-website-cc58a.firebaseapp.com",
+        projectId: "admin-website-cc58a",
+        storageBucket: "admin-website-cc58a.appspot.com",
+        messagingSenderId: "1038815370367",
+        appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Function to fetch and display students from the 'studentRequests' collection
+    async function fetchStudents(studentID = "") {
+        const studentsRef = collection(db, "studentRequests");
+        let q;
+
+        if (studentID) {
+            q = query(studentsRef, where("StudentID", "==", studentID));
+        } else {
+            q = studentsRef;
+        }
+
+        try {
+            const snapshot = await getDocs(q);
+            const tableBody = document.getElementById('studentTableBody');
+            tableBody.innerHTML = '';  // Clear table body before inserting
+
+            if (snapshot.empty) {
+                console.log("No matching documents.");
+                return;
+            }
+
+            snapshot.forEach(doc => {
+            const student = doc.data();
+            // Skip students with StudentID in the format "STUxxxxxxxxxxxxx"
+            if (/^STU\d{13}$/.test(student.StudentID)) {
+                return;
+            }
+                if (student && student.StudentID && student.StudentPassword) {
+                    // Only display if StudentID and Password are present
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${student.StudentID}</td>
+                        <td>${student.StudentPassword}</td>
+                        <td>${student.StudentNIC}</td>
+                        <td>${student.FirstName}</td>
+                        <td>${student.LastName}</td>
+                        <td>${student.Age}</td>
+                        <td>${student.Gender}</td>
+                        <td>${student.Address}</td>
+                        <td>${student.Stream}</td>
+                        <td>${student.School}</td>
+                        <td>${student.AcademicYear}</td>
+                        <td>${student.Email}</td>
+                        <td>${student.TelephoneNo}</td>
+                        <td><button class="delete-btn" data-docid="${doc.id}">Delete</button></td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            });
+
+            // Add event listeners to all delete buttons after fetching data
+            addDeleteButtonListeners();
+
+        } catch (error) {
+            console.error("Error fetching student data:", error);
+            alert("An error occurred while fetching student data. Check the console for details.");
+        }
+    }
+
+    // Function to add delete button event listeners after the table is populated
+    function addDeleteButtonListeners() {
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const docId = button.getAttribute('data-docid');
+                deleteStudent(docId);
+            });
+        });
+    }
+
+    // Function to delete the student and parent details
+    async function deleteStudent(docid) {
+        const studentDocRef = doc(db, "studentRequests", docid);
+
+        try {
+            // Fetch the student document to get the ParentID
+            const studentDoc = await getDoc(studentDocRef);
+            if (studentDoc.exists()) {
+                const student = studentDoc.data();
+                const parentID = student.ParentID;  // Assuming there's a ParentID field
+
+                // Delete the student document
+                await deleteDoc(studentDocRef);
+
+                // If parent data exists, delete from the 'parentRequests' collection
+                if (parentID) {
+                    const parentDocRef = doc(db, "parentRequests", parentID); // Correct the collection name here
+                    await deleteDoc(parentDocRef);
+                }
+
+                alert("Student and associated parent details deleted successfully.");
+                fetchStudents(); // Refresh the table to reflect changes
+            } else {
+                alert("Student document does not exist.");
+            }
+        } catch (error) {
+            console.error("Error deleting student and parent details:", error);
+            alert("An error occurred while deleting the student and parent details.");
+        }
+    }
+
+    // Event listener for the search button
+    document.getElementById('searchBtn').addEventListener('click', () => {
+        const studentID = document.getElementById('searchStudentID').value.trim();
+        fetchStudents(studentID);
+    });
+
+    // Event listener for the reset button to show all students
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('searchStudentID').value = "";
+        fetchStudents();  // Fetch all students if reset is clicked
+    });
+
+    // Initialize the fetch operation when the document is ready
+    document.addEventListener("DOMContentLoaded", () => fetchStudents());
+</script>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <link rel="stylesheet" href="Login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+   
+
+  </head>
+
+<body>
+
+<img src="C:\Users\thari\Downloads\Fr.png" width=1000px height=730px align="left">
+<div class="wrapper">
+    <header>Welcome to Our Website</header>
+    <p class="welcome-msg">Please login to continue</p>
+
+    <form id="login-form" action="#">
+      <div class="field email">
+          <div class="input-area">
+              <input type="text" id="email" placeholder="Email Address">
+              <i class="icon fas fa-envelope"></i>
+              <i class="error error-icon fas fa-exclamation-circle"></i>
+          </div>
+          <div class="error error-txt">Email can't be blank</div>
+      </div>
+      <div class="field password">
+          <div class="input-area">
+              <input type="password" id="password" placeholder="Password">
+              <i class="icon fas fa-lock"></i>
+              <i class="error error-icon fas fa-exclamation-circle"></i>
+          </div>
+          <div class="error error-txt">Password can't be blank</div>
+      </div>
+      
+      <input type="submit" value="Login">
+  </form>
+  
+</div>
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  import {getFirestore, setDoc, doc} from  "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+    authDomain: "admin-website-cc58a.firebaseapp.com",
+    projectId: "admin-website-cc58a",
+    storageBucket: "admin-website-cc58a.appspot.com",
+    messagingSenderId: "1038815370367",
+    appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Handle form submission
+  document.getElementById('login-form').addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('Logged in as:', user.email);
+      // Redirect or perform further actions
+      window.location.href = "indexmenu.html";
+    } catch (error) {
+      console.error('Error logging in:', error.message);
+      alert('Invalid email or password. Please try again.');
+      // Handle login error
+    }
+  });
+</script>
+
+</body>
+
+</html>

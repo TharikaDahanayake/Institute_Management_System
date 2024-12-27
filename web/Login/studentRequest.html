@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            background-size: cover;
+            color: #010048;
+        }
+        .container {
+            width: 90%;
+            margin: 20px auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: url("C:/Users/thari/Downloads/depositphotos_41723613-stock-photo-abstract-background-blue-colour.jpg");
+            color: white;
+        }
+        td {
+            background-color: #f3f6f4;
+            color: black;
+        }
+        tr:hover {
+            background-color: #f2f2f2;
+            cursor: pointer;
+        }
+
+        .scroll-container {
+            display: block;
+            width: 100%;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .action-button {
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            background-color: red;
+            width: 80px;
+            text-align: center;
+        }
+        .action-button:hover {
+            background-color: darkred;
+        }
+        .editable-field {
+            border: 1px solid #ddd;
+            padding: 5px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Student Requests</h2>
+    <div class="scroll-container">
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>StudentNIC</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Address</th>
+                <th>Stream</th>
+                <th>School</th>
+                <th>Academic Year</th>
+                <th>Email</th>
+                <th>Telephone No</th>
+                <th>Parent NIC</th>
+                <th>Parent Name</th>
+                <th>Parent Tel</th>
+                <th>Parent Email</th>
+                <th>ParentID</th>
+                <th>ParentPassword</th>
+                <th>Date_Time</th>
+                <th>StudentID</th>
+                <th>Password</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="studentTableBody">
+            <!-- Data will be dynamically inserted here -->
+        </tbody>
+    </table>
+</div>
+</div>
+
+<script type="module">
+    // Import Firebase functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, where, collection, setDoc, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, query } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // Your Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+        authDomain: "admin-website-cc58a.firebaseapp.com",
+        projectId: "admin-website-cc58a",
+        storageBucket: "admin-website-cc58a.appspot.com",
+        messagingSenderId: "1038815370367",
+        appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fetchStudents() {
+        const studentRequestsRef = collection(db, "studentRequests");
+
+        try {
+            const snapshot = await getDocs(studentRequestsRef);
+            const tableBody = document.getElementById('studentTableBody');
+            tableBody.innerHTML = ''; // Clear the table body before inserting new data
+
+            snapshot.forEach(doc => {
+                const student = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.StudentNIC}</td>
+                    <td>${student.FirstName}</td>
+                    <td>${student.LastName}</td>
+                    <td>${student.Age}</td>
+                    <td>${student.Gender}</td>
+                    <td>${student.Address}</td>
+                    <td>${student.Stream}</td>
+                    <td>${student.School}</td>
+                    <td>${student.AcademicYear}</td>
+                    <td>${student.Email}</td>
+                    <td>${student.TelephoneNo}</td>
+                    <td>${student.ParentNIC}</td>
+                    <td>${student.ParentName}</td>
+                    <td>${student.ParentTelephone}</td>
+                    <td>${student.ParentEmail}</td>
+                    <td><input type="text" class="editable-field" value="${student.ParentID}" id="parentID-${doc.id}"></td>
+                    <td><input type="text" class="editable-field" value="${student.ParentPassword}" id="parentPassword-${doc.id}"></td>
+                    <td>${student.Date_Time}</td>
+                    <td><input type="text" class="editable-field" value="${student.StudentID}" id="studentID-${doc.id}"></td>
+                    <td><input type="text" class="editable-field" value="${student.StudentPassword}" id="password-${doc.id}"></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-button" onclick="acceptStudent('${doc.id}')">Accept</button>
+                  
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Error fetching student data:", error);
+        }
+    }
+
+    
+
+    // Accept a student and update the student requests table
+    window.acceptStudent = async function (docid) {
+    const studentID = document.getElementById(`studentID-${docid}`).value;
+    const password = document.getElementById(`password-${docid}`).value;
+    const parentID = document.getElementById(`parentID-${docid}`).value;
+    const parentPassword = document.getElementById(`parentPassword-${docid}`).value;
+
+    // Validate StudentID and ParentID format
+    const studentIDPattern = /^St\/\d{2}\/\d{4}$/;
+    const parentIDPattern = /^Pr\/\d{2}\/\d{4}$/;
+
+    if (!studentIDPattern.test(studentID)) {
+        alert("Invalid StudentID format. Please use 'St/xx/xxxx'.");
+        return;
+    }
+
+    if (!parentIDPattern.test(parentID)) {
+        alert("Invalid ParentID format. Please use 'Pr/xx/xxxx'.");
+        return;53
+    }
+    
+// Check if the StudentID already exists in the studentRequests collection
+const studentRequestsRef = collection(db, "studentRequests");
+    const studentQuery = query(studentRequestsRef, where("StudentID", "==", studentID));
+    const studentSnapshot = await getDocs(studentQuery);
+
+    if (!studentSnapshot.empty) {
+        alert("This StudentID already exists in the studentRequests table. Cannot accept this student.");
+        return;
+    }
+
+    // Check if the ParentID already exists in the studentRequests collection
+    const parentQuery = query(studentRequestsRef, where("ParentID", "==", parentID));
+    const parentSnapshot = await getDocs(parentQuery);
+
+    if (!parentSnapshot.empty) {
+        alert("This ParentID is already associated with another parent. Please choose a different ParentID.");
+        return;
+    }
+
+
+
+    const studentDocRef = doc(db, "studentRequests", docid);
+
+    try {
+        const studentDoc = await getDoc(studentDocRef);
+        if (studentDoc.exists()) {
+
+            const studentData = studentDoc.data();
+
+            // Save parent details to the parents collection
+            const parentData = {
+                ParentEmail: studentData.ParentEmail,
+                ParentID: parentID,
+                ParentNIC: studentData.ParentNIC,
+                ParentName: studentData.ParentName,
+                ParentPassword: parentPassword,
+                ParentTel: studentData.ParentTel,
+                StudentID: studentID
+            };
+
+            await setDoc(doc(db, "parents", parentID), parentData);
+            
+          
+            // Update the student details
+            await updateDoc(studentDocRef, {
+                StudentID: studentID,
+                StudentPassword: password,   // Ensure this matches your Firestore field
+                ParentID: parentID,
+                ParentPassword: parentPassword
+            });
+
+           
+
+            alert("Student and parent details saved successfully.");
+            fetchStudents(); // Refresh the table
+        } else {
+            alert("Student document does not exist.");
+        }
+    } catch (error) {
+        console.error("Error saving student:", error);
+        alert("An error occurred while updating the student: " + error.message);
+    }
+};
+
+// Function to open Gmail with pre-filled "To" address and email body
+
+    // Call fetchStudents when the page loads to display the data
+    window.onload = fetchStudents;
+
+
+
+    
+    
+</script>
+
+
+</body>
+</html>

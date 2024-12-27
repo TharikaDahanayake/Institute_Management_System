@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Details</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            background-size: cover;
+            color: #010048; /* Set text color to black */
+        }
+        .container {
+            width: 90%;
+            margin: 20px auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #searchBar {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #060607;
+        }
+        button {
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            background-color: #02006c; /* Blue background color */
+            color: white;
+        }
+        button:hover {
+            background-color: #004494; /* Darker blue on hover */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #a6a6a6;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: url("C:/Users/thari/Downloads/depositphotos_41723613-stock-photo-abstract-background-blue-colour.jpg");
+            color: white;
+        }
+        td {
+            background-color: #f3f6f4;
+            color: black;
+        }
+        tr:hover {
+            background-color: #a6a6a6;
+            cursor: pointer;
+        }
+        .scroll-container {
+            display: block;
+            width: 100%;
+            max-height: 600px; /* Increase table height */
+            overflow-y: auto;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>All Teacher Details</h2>
+
+    <!-- Search Bar -->
+    <div id="searchBar">
+        <input type="text" id="searchTeacherID" placeholder="Enter TeacherID">
+        <button id="searchBtn">Search</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+    <div class="scroll-container">
+    <table id="teacherTable">
+        <thead>
+            <tr>
+                <th>TeacherID</th>
+                <th>NIC</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Stream</th>
+                <th>Subject</th>
+                <th>Address</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Qualifications</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="teacherTableBody">
+            <!-- Data will be dynamically inserted here -->
+        </tbody>
+    </table>
+</div>
+</div>
+
+<script type="module">
+    // Import Firebase functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // Your Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+        authDomain: "admin-website-cc58a.firebaseapp.com",
+        projectId: "admin-website-cc58a",
+        storageBucket: "admin-website-cc58a.appspot.com",
+        messagingSenderId: "1038815370367",
+        appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Function to fetch and display teachers
+    async function fetchTeachers(teacherID = "") {
+        const teachersRef = collection(db, "teachers");
+        let q;
+
+        if (teacherID) {
+            // Query for specific TeacherID
+            q = query(teachersRef, where("teacherID", "==", teacherID));
+        } else {
+            // Fetch all teachers
+            q = teachersRef;
+        }
+
+        try {
+            const snapshot = await getDocs(q);
+            const tableBody = document.getElementById('teacherTableBody');
+            tableBody.innerHTML = ''; // Clear the table body before inserting new data
+
+            snapshot.forEach(doc => {
+                const teacher = doc.data(); // Get teacher data
+                console.log(teacher); // Log the teacher data to the console
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${teacher.teacherID}</td>
+                    <td>${teacher.nic}</td>
+                    <td>${teacher.fname}</td>
+                    <td>${teacher.lname}</td>
+                    <td>${teacher.age}</td>
+                    <td>${teacher.gender}</td>
+                    <td>${teacher.stream}</td>
+                    <td>${teacher.subjectName}</td>
+                    <td>${teacher.address}</td>
+                    <td>${teacher.email}</td>
+                    <td>${teacher.telephone}</td>
+                    <td>${teacher.qualification}</td>
+                    <td><button class="delete-btn" onclick="deleteTeacher('${doc.id}')">Delete</button></td>
+                `;
+                tableBody.appendChild(row); // Append the row to the table body
+            });
+        } catch (error) {
+            console.error("Error fetching teacher data:", error);
+        }
+    }
+
+    // Function to delete a teacher
+    window.deleteTeacher = async function (teacherId) {
+        if (confirm(`Are you sure you want to delete teacher with ID: ${teacherId}?`)) {
+            try {
+                await deleteDoc(doc(db, "teachers", teacherId));
+                fetchTeachers(); // Refresh the teacher list after deletion
+            } catch (error) {
+                console.error('Error deleting teacher:', error);
+                alert('Failed to delete teacher');
+            }
+        }
+    };
+
+    // Event listener for the search button
+    document.getElementById('searchBtn').addEventListener('click', () => {
+        const teacherID = document.getElementById('searchTeacherID').value.trim();
+        fetchTeachers(teacherID);
+    });
+
+    // Event listener for the reset button to show all teachers
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('searchTeacherID').value = "";
+        fetchTeachers();
+    });
+
+    // Initialize the fetch operation when the document is ready
+    document.addEventListener("DOMContentLoaded", () => fetchTeachers());
+</script>
+
+
+</body>
+</html>

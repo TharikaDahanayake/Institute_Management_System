@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details Form</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #d6d6d6;  
+            color: #010048;
+        }
+        .container {
+            width: 60%;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 10px solid #010048; /* Dark blue border */
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #010048;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #010048;
+        }
+        .scroll-container {
+            display: block;
+            width: 100%;
+            max-height: 600px; /* Increase table height */
+            overflow-y: auto;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            position: relative;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="tel"],
+        textarea {
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        textarea {
+            resize: vertical;
+        }
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #02006c;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #004494;
+        }
+        .suggestion-box {
+            position: absolute;
+            top: 45px;
+            left: 0;
+            width: 250px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .suggestion-box div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .suggestion-box div:hover {
+            background-color: #f4f4f4;
+        }
+        select {
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%; /* Ensure it matches the width of other fields */
+            box-sizing: border-box; /* Include padding and border in the element's total width */
+        }
+            </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Details Form</h1>
+        <div class="scroll-container">
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" id="searchStudentID" placeholder="Enter Student ID to Search">
+                <button type="button" id="searchBtn">Search</button>
+            </div>
+            
+            <!-- Student Details Form -->
+            <form id="studentForm">
+                <label for="studentID">Student ID:</label>
+                <input type="text" id="studentID" name="studentID" readonly>
+
+                <label for="nic">NIC:</label>
+                <input type="text" id="nic" name="nic">
+
+                <label for="fname">First Name:</label>
+                <input type="text" id="fname" name="fname">
+
+                <label for="lname">Last Name:</label>
+                <input type="text" id="lname" name="lname">
+
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age">
+
+                <label for="gender">Gender:</label>
+                <div class="gender-options">
+                    <input type="radio" id="male" name="gender" value="Male">
+                    <label for="male">Male</label>
+                    <input type="radio" id="female" name="gender" value="Female">
+                    <label for="female">Female</label>
+                </div>
+
+                <label for="school">School:</label>
+                <input type="text" id="school" name="school">
+
+                
+                <div class="form-group">
+                    <label for="stream">Stream:</label>
+                    <select id="stream">
+                        <option value="Select stream">Select Stream</option>
+                        <option value="Science stream">Science stream</option>
+                        <option value="Commerce stream">Commerce stream</option>
+                        <option value="Arts stream">Arts stream</option>
+                        <option value="Technology stream">Technology stream</option>
+                        <option value="Physical Science stream">Physical Science stream</option>
+                        <option value="Maths stream">Maths stream</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="acadamic_year">Academic Year:</label>
+                    <select id="acadamic_year">
+                        <option value="Select Academic Year">Select Academic Year</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                       
+                    </select>
+                </div>
+
+              
+        
+
+                <label for="address">Address:</label>
+                <textarea id="address" name="address"></textarea>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+
+                <label for="telephone">Telephone Number:</label>
+                <input type="tel" id="telephone" name="telephone" pattern="\d{10}" title="Please enter a 10-digit number">
+
+                <h2>Parent Information</h2>
+
+                <label for="parentName">Parent Name:</label>
+                <input type="text" id="parentName" name="parentName">
+
+                <label for="parentNIC">Parent NIC:</label>
+                <input type="text" id="parentNIC" name="parentNIC">
+
+                <label for="parentTel">Parent Telephone:</label>
+                <input type="tel" id="parentTel" name="parentTel" pattern="\d{10}" inputmode="numeric" title="Please enter a 10-digit phone number">
+
+                <label for="parentEmail">Parent Email:</label>
+                <input type="email" id="parentEmail" name="parentEmail">
+
+                <div class="form-buttons">
+                    <button type="reset">Clear</button>
+                    <button type="button" id="updateBtn">Update</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, updateDoc, doc} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+        authDomain: "admin-website-cc58a.firebaseapp.com",
+        projectId: "admin-website-cc58a",
+        storageBucket: "admin-website-cc58a.appspot.com",
+        messagingSenderId: "1038815370367",
+        appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+    
+        // Declare currentDocId to store the document ID
+        let currentDocId = "";
+    
+
+          
+
+
+    document.getElementById('searchBtn').addEventListener('click', async function () {
+    const StudentID = document.getElementById('searchStudentID').value;
+
+    if (StudentID) {
+        try {
+            // Query to get student details from the studentRequests collection based on StudentID
+            const studentQuery = query(collection(db, 'studentRequests'), where('StudentID', '==', StudentID));
+            const querySnapshot = await getDocs(studentQuery);
+
+            if (!querySnapshot.empty) {
+                const studentDoc = querySnapshot.docs[0]; // Get the first matched document
+                const studentData = studentDoc.data();
+
+                // Store the document ID in currentDocId
+                currentDocId = studentDoc.id;
+
+                // Populate the form fields with fetched data
+                document.getElementById('studentID').value = studentData.StudentID || '';
+                document.getElementById('nic').value = studentData.StudentNIC || '';
+                document.getElementById('fname').value = studentData.FirstName || '';
+                document.getElementById('lname').value = studentData.LastName || '';
+                document.getElementById('age').value = studentData.Age || '';
+                if (studentData.Gender === 'Male') {
+                    document.getElementById('male').checked = true;
+                } else {
+                    document.getElementById('female').checked = true;
+                }
+                document.getElementById('school').value = studentData.School || '';
+                document.getElementById('acadamic_year').value = studentData.AcademicYear || '';
+                document.getElementById('address').value = studentData.Address || '';
+                document.getElementById('email').value = studentData.Email || '';
+                document.getElementById('telephone').value = studentData.TelephoneNo || '';
+                document.getElementById('parentName').value = studentData.ParentName || '';
+                document.getElementById('parentNIC').value = studentData.ParentNIC || '';
+                document.getElementById('parentTel').value = studentData.ParentTelephone || '';
+                document.getElementById('parentEmail').value = studentData.ParentEmail || '';
+
+                // Set the Stream field dynamically
+                const streamDropdown = document.getElementById('stream');
+                const streamOptions = Array.from(streamDropdown.options);
+                const selectedStream = studentData.Stream || '';
+
+                // Check and set the selected value in the dropdown
+                const matchedOption = streamOptions.find(option => option.value === selectedStream);
+                if (matchedOption) {
+                    streamDropdown.value = selectedStream;
+                } else {
+                    alert('The stream for the searched student ID does not match any of the available options.');
+                    streamDropdown.value = "Select stream"; // Default to "Select stream"
+                }
+            } else {
+                alert('No student found with the provided ID.');
+            }
+        } catch (error) {
+            console.error('Error fetching student details:', error);
+            alert('An error occurred while fetching student details.');
+        }
+    } else {
+        alert('Please enter a Student ID.');
+    }
+});
+    
+
+// Email validation function
+function validateEmail(email) {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
+}
+
+        // Event listener for the Update button
+        document.getElementById('updateBtn').addEventListener('click', async function () {
+            if (!currentDocId) {
+                alert("Please search and select a student to update.");
+                return;
+            }
+
+            // Get email values
+    const studentEmail = document.getElementById('email').value.trim();
+    const parentEmail = document.getElementById('parentEmail').value.trim();
+
+    // Validate emails
+    if (!validateEmail(studentEmail)) {
+        alert('Please enter a valid student email address.');
+        return;
+    }
+
+    if (!validateEmail(parentEmail)) {
+        alert('Please enter a valid parent email address.');
+        return;
+    }
+    
+            // Validation: Check for empty fields
+            const StudentID = document.getElementById('studentID').value.trim();
+            const StudentNIC = document.getElementById('nic').value.trim();
+            const FirstName = document.getElementById('fname').value.trim();
+            const LastName = document.getElementById('lname').value.trim();
+            const Age = document.getElementById('age').value.trim();
+            const Gender = document.querySelector('input[name="gender"]:checked')?.value || '';
+            const School = document.getElementById('school').value.trim();
+            const Stream = document.getElementById('stream').value.trim();
+            const AcademicYear = document.getElementById('acadamic_year').value.trim();
+            const Address = document.getElementById('address').value.trim();
+            const Email = document.getElementById('email').value.trim();
+            const TelephoneNo = document.getElementById('telephone').value.trim();
+            const ParentName = document.getElementById('parentName').value.trim();
+            const ParentNIC = document.getElementById('parentNIC').value.trim();
+            const ParentTelephone = document.getElementById('parentTel').value.trim();
+            const ParentEmail = document.getElementById('parentEmail').value.trim();
+    
+            if (!StudentID || !StudentNIC || !FirstName || !LastName || !Age || !Gender || !School || !Stream || !AcademicYear || !Address || !Email || !TelephoneNo || !ParentName || !ParentNIC || !ParentTelephone || !ParentEmail) {
+                alert("All fields are required. Please fill in all fields before updating.");
+                return;
+            }
+
+
+            // Regular expression to check if the name contains only letters (no numbers or special characters)
+const nameRegex = /^[A-Za-z]+$/;
+
+// Validate student's first name
+if (!nameRegex.test(FirstName)) {
+  alert('Please enter a valid first name for student!');
+  return false;
+}
+
+// Validate student's last name
+if (!nameRegex.test(LastName)) {
+  alert('Please enter a valid last name for student!');
+  return false;
+}
+
+// Validate parent's name
+if (!nameRegex.test(ParentName)) {
+  alert('Please enter a valid parent name!');
+  return false;
+}
+            // Check if the telephone numbers are numeric and exactly 10 digits
+            if (!/^\d{10}$/.test(TelephoneNo) || !/^\d{10}$/.test(ParentTelephone)) {
+                alert("Please enter valid 10-digit phone numbers.");
+                return;
+            }
+
+            if (!validateAge(Age)) {
+    alert("Please enter a valid age between 16 and 22.");
+    return;
+
+
+
+}
+    
+            const updatedData = {
+                StudentID,
+                StudentNIC,
+                FirstName,
+                LastName,
+                Age,
+                Gender,
+                School,
+                Stream,
+                AcademicYear,
+                Address,
+                Email,
+                TelephoneNo,
+                ParentName,
+                ParentNIC,
+                ParentTelephone,
+                ParentEmail
+            };
+
+            
+            try {
+                const studentDoc = doc(db, "studentRequests", currentDocId);
+                
+                await updateDoc(studentDoc, updatedData);
+                
+                alert("Student details updated successfully.");
+            } catch (error) {
+                console.error("Error updating student details:", error);
+                alert("Failed to update student details.");
+            }
+        });
+
+        
+
+                // Function to validate age
+        function validateAge(Age) {
+            const numericAge = parseInt(Age, 10);
+            return numericAge >= 16 && numericAge <= 22;
+        }
+   
+    </script>
+    
+</body>
+</html>

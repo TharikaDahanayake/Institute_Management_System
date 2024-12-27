@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            color: #010048;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 1100px;
+            margin: 18px;
+            padding: 18px; 
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-message {
+            margin-bottom: 18px;
+            font-size: 2em;
+            text-align: center;
+            color: Black;
+        }
+
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: url("C:/Users/thari/Downloads/depositphotos_41723613-stock-photo-abstract-background-blue-colour.jpg");
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 22%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Adjusts layout for icon placement */
+            color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-left: 13px;
+        }
+
+        .stat-item i {
+            font-size: 3em;
+            margin-right: 20px;
+        }
+
+        .stat-item h3 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .stat-item p {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .calendar, .notice-board {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 48%;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border: 2px solid #012652;
+        }
+
+        .calendar h3, .notice-board h3 {
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .notice-board ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .notice-board li {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f7f9fc;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .notice-board li:hover {
+            transform: scale(1.02);
+        }
+
+        .notice-board h3 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .notice-board p {
+            margin: 5px 0;
+        }
+
+        .notice-board span {
+            display: block;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        /* Add styling for the icons */
+        .stat-icon {
+            width: 50px; /* Adjust size as needed */
+            height: auto; /* Maintain aspect ratio */
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="stats">
+            <div class="stat-item">
+                <div>
+                    <h3 id="teacher-count">0</h3>
+                    <p>Teachers</p>
+                </div>
+                <img class="stat-icon" src="https://img.icons8.com/ios/452/teacher.png" alt="Teacher Icon" />
+            </div>
+            <div class="stat-item">
+                <div>
+                    <h3 id="student-count">0</h3>
+                    <p>Students</p>
+                </div>
+                <img class="stat-icon" src="https://img.icons8.com/ios/452/student-female.png" alt="Student Icon" />
+            </div>
+            <div class="stat-item">
+                <div>
+                    <h3 id="class-count">0</h3>
+                    <p>Classes</p>
+                </div>
+                <img class="stat-icon" src="https://img.icons8.com/ios/452/classroom.png" alt="Class Icon" />
+            </div>
+            <div class="stat-item">
+                <div>
+                    <h3 id="subject-count">0</h3>
+                    <p>Subjects</p>
+                </div>
+                <img class="stat-icon" src="https://img.icons8.com/ios/452/book.png" alt="Subject Icon" />
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="calendar">
+                <h3>Calendar</h3>
+                <iframe src="https://calendar.online/910ebee41851434c4b1b" 
+                        style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+            </div>
+            <div class="notice-board">
+                <h3>Notice Board</h3>
+                <ul id="notice-list">
+                    <!-- Notices will be dynamically inserted here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Import the necessary functions from the Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+            authDomain: "admin-website-cc58a.firebaseapp.com",
+            projectId: "admin-website-cc58a",
+            storageBucket: "admin-website-cc58a.appspot.com",
+            messagingSenderId: "1038815370367",
+            appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+    
+        // Initialize Firestore
+        const db = getFirestore(app);
+    
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Fetch student, teacher, class, and subject counts
+                const [studentsSnapshot, teachersSnapshot, classesSnapshot, subjectsSnapshot] = await Promise.all([
+                    getDocs(collection(db, 'studentRequests')),
+                    getDocs(collection(db, 'teachers')),
+                    getDocs(collection(db, 'classes')),
+                    getDocs(collection(db, 'subjects'))
+                ]);
+    
+                const studentCount = studentsSnapshot.size;
+                const teacherCount = teachersSnapshot.size;
+                const classCount = classesSnapshot.size;
+                const subjectCount = subjectsSnapshot.size;
+    
+                // Update counts
+                document.getElementById('student-count').textContent = studentCount;
+                document.getElementById('teacher-count').textContent = teacherCount;
+                document.getElementById('class-count').textContent = classCount;
+                document.getElementById('subject-count').textContent = subjectCount;
+    
+                // Load notices
+                loadNotices();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        });
+    
+        // Function to load notices into the page
+async function loadNotices() {
+    const noticeList = document.getElementById('notice-list');
+    noticeList.innerHTML = ''; // Clear the list
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "notices"));
+        const notices = [];
+
+        querySnapshot.forEach((doc) => {
+            const noticeData = doc.data();
+            notices.push({
+                id: doc.id,
+                ...noticeData,
+            });
+        });
+
+        // Sort notices by date in descending order
+        notices.sort((a, b) => b.Date - a.Date);
+
+        // Get the latest two notices
+        const latestNotices = notices.slice(0, 2);
+
+        latestNotices.forEach((notice) => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <h3>${notice.Title}</h3>
+                <p>${notice.Details}</p>
+                <span>Posted by: ${notice.PostedBy}</span><br>
+                <span>Date: ${new Date(notice.Date).toLocaleDateString()}</span>
+            `;
+            noticeList.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error("Error loading notices: ", error);
+    }
+}
+
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Enrollment Details</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white; 
+            background-size: cover;
+            color: #010048;
+        }
+        .container {
+            width: 90%;
+            margin: 20px auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-container input {
+            padding: 8px;
+            border-radius: 4px 0 0 4px;
+            border: 1px solid #ddd;
+            width: 250px;
+        }
+        .search-container button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 0 4px 4px 0;
+            background-color: #010048;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .search-button, .reset-button, .delete-btn {
+            margin-left: 10px;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #02006c;
+            color: white;
+            cursor: pointer;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: url("C:/Users/thari/Downloads/depositphotos_41723613-stock-photo-abstract-background-blue-colour.jpg");
+            color: white;
+        }
+        td {
+            background-color: #f3f6f4;
+            color: black;
+        }
+        tr:hover {
+            background-color: #e0e0e0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>All Class Enrollment Details</h2>
+    <div class="search-container">
+        <input type="text" id="searchClassID" placeholder="Search by Class ID">
+        <input type="button" id="searchBtn" value="Search" class="search-button">
+        <input type="button" id="resetBtn" value="Reset" class="reset-button">
+        <input type="button" id="generateReportBtn" value="Generate Enrollment Report" class="search-button">
+    </div>
+    <table id="classTable">
+        <thead>
+            <tr>
+                <th>Class ID</th>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Duration</th>
+                <th>Stream</th>
+                <th>Student ID</th>
+                <th>Subject ID</th>
+                <th>Teacher ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="classTableBody">
+            <!-- Data will be dynamically inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+        authDomain: "admin-website-cc58a.firebaseapp.com",
+        projectId: "admin-website-cc58a",
+        storageBucket: "admin-website-cc58a.appspot.com",
+        messagingSenderId: "1038815370367",
+        appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    
+    async function validateClassEnrollment(classData) {
+    // Add your validation logic here.
+    // Example:
+    if (!classData.classId || !classData.studentId || !classData.subjectId) {
+        return false; // Invalid if any required field is missing
+    }
+    return true; // Valid if all checks pass
+}
+async function fetchClasses(classId = "") {
+    const classEnrollmentRef = collection(db, "ClassEnrollment");
+    let q;
+
+    if (classId) {
+        q = query(classEnrollmentRef, where("classId", "==", classId));
+    } else {
+        q = classEnrollmentRef;
+    }
+
+    try {
+        const snapshot = await getDocs(q);
+        const tableBody = document.getElementById('classTableBody');
+        tableBody.innerHTML = ''; // Clear the table body before inserting new data
+
+        if (snapshot.empty) {
+            const message = document.createElement('tr');
+            message.innerHTML = `<td colspan="10">No records found</td>`;
+            tableBody.appendChild(message);
+            return; // Exit the function
+        }
+
+        snapshot.forEach(async doc => {
+            const classData = doc.data();
+            const isValid = await validateClassEnrollment(classData);
+            if (!isValid) return; // Skip invalid records
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${classData.classId}</td>
+                <td>${classData.date}</td>
+                <td>${classData.day}</td>
+                <td>${classData.duration}</td>
+                <td>${classData.stream}</td>
+                <td>${classData.studentId}</td>
+                <td>${classData.subjectId}</td>
+                <td>${classData.teacherId}</td>
+                <td><button class="delete-btn" onclick="deleteClass('${doc.id}')">Delete</button></td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching class data:", error);
+        alert('Failed to fetch class data. Please try again.');
+    }
+}
+
+    window.deleteClass = async function (classId) {
+        if (confirm(`Are you sure you want to delete the class with ID: ${classId}?`)) {
+            try {
+                await deleteDoc(doc(db, "ClassEnrollment", classId));
+                fetchClasses(); // Refresh the class list after deletion
+            } catch (error) {
+                console.error('Error deleting class:', error);
+                alert('Failed to delete class');
+            }
+        }
+    };
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+        const classId = document.getElementById('searchClassID').value.trim();
+        fetchClasses(classId);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('searchClassID').value = "";
+        fetchClasses();
+    });
+
+    document.addEventListener("DOMContentLoaded", () => fetchClasses());
+
+    // Enrollment Report Generation Functionality
+    document.getElementById('generateReportBtn').addEventListener('click', async () => {
+        const classEnrollmentRef = collection(db, "ClassEnrollment");
+        try {
+            const snapshot = await getDocs(classEnrollmentRef);
+            if (snapshot.empty) {
+                alert("No records available for report generation.");
+                return;
+            }
+
+            // Initialize CSV content with column headers
+            let csvContent = "Class ID,Date,Day,Duration,Stream,Student ID,Subject ID,Teacher ID\n";
+
+            // Loop through each class document and append to CSV
+            snapshot.forEach(doc => {
+                const classData = doc.data();
+                csvContent += `${classData.classId},${classData.date},${classData.day},${classData.duration},${classData.stream},${classData.studentId},${classData.subjectId},${classData.teacherId}\n`;
+            });
+
+            // Trigger CSV download
+            downloadCSV(csvContent, 'ClassEnrollmentReport.csv');
+        } catch (error) {
+            console.error("Error generating report:", error);
+            alert('Failed to generate report. Please try again.');
+        }
+    });
+
+/*
+    async function loadSubjects() {
+    const db = getFirestore();
+    const subjectsCollection = collection(db, "subjects");
+
+    try {
+        const snapshot = await getDocs(subjectsCollection);
+        if (snapshot.empty) {
+            console.warn("No subjects found in the database.");
+            return;
+        }
+
+        const subjectDropdown = document.getElementById("subjectDropdown");
+        subjectDropdown.innerHTML = ""; // Clear existing options
+
+        snapshot.forEach(doc => {
+            const subjectData = doc.data();
+            const option = document.createElement("option");
+            option.value = doc.id; // Subject ID
+            option.textContent = subjectData.subjectName; // Subject Name
+            subjectDropdown.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error loading subjects:", error);
+        alert("Failed to load subjects. Please try again.");
+    }
+}
+*/
+// Ensure you call loadSubjects on page load or when needed
+document.addEventListener("DOMContentLoaded", loadSubjects);
+
+    function downloadCSV(csvContent, filename) {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+
+</body>
+</html>

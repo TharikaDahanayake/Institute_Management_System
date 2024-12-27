@@ -1,0 +1,330 @@
+@import url('https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+ 
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.menu-frame {
+    width: 20%;
+    background-color:#03002e
+
+    ;
+}
+
+.menu-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.content-frame {
+    width: 80%;
+}
+
+.content-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    
+}
+
+.menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu ul li {
+    margin: 10px 0;
+    position: relative;
+}
+
+.menu ul li a {
+    display: block;
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+    background-color: #03002e
+
+    ;
+    border-bottom: 1px solid #1B2EDD;
+}
+
+.menu ul li a:hover {
+    background-color: #1B2EDD;
+}
+
+.menu ul ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    padding-left: 20px;
+}
+
+.menu ul ul li {
+    margin: 6px 0;
+}
+
+.menu ul ul li a {
+    background-color: #03002e
+
+    ;
+    border-bottom: none;
+}
+
+.menu ul ul li a:hover {
+    background-color: #1B2EDD
+
+    ;
+}
+
+.student-details-container {
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.student-image {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+}
+
+.search-box {
+    width: 300px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.heading {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.student-details-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.form-row label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.form-row input[type="text"],
+.form-row input[type="number"],
+.form-row input[type="email"] {
+    flex: 2;
+    padding: 8px;
+    font-size: 16px;
+}
+
+.form-row input[type="radio"] {
+    margin-right: 5px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.teacher-details-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.form-row label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.form-row input[type="text"],
+.form-row input[type="number"],
+.form-row input[type="email"] {
+    flex: 2;
+    padding: 8px;
+    font-size: 16px;
+}
+
+.form-row input[type="radio"] {
+    margin-right: 5px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+
+.teacher-registration-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.form-row label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.form-row input[type="text"],
+.form-row input[type="number"],
+.form-row input[type="email"] {
+    flex: 2;
+    padding: 8px;
+    font-size: 16px;
+}
+
+.form-row input[type="radio"] {
+    margin-right: 5px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.teacher-details-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.form-row label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.form-row input[type="text"],
+.form-row input[type="number"],
+.form-row input[type="email"] {
+    flex: 2;
+    padding: 8px;
+    font-size: 16px;
+}
+
+.form-row input[type="radio"] {
+    margin-right: 5px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+}
+
+.modal-content {
+    background-color: #fefefe; /* White background */
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px; /* Some padding */
+    border: 1px solid #888; /* Gray border */
+    width: 30%; /* Could be more or less, depending on screen size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    border-radius: 8px; /* Rounded corners */
+}
+
+.close {
+    color: #aaa; /* Gray */
+    float: right; /* Float the close button to the right */
+    font-size: 28px; /* Large size */
+    font-weight: bold; /* Bold text */
+}
+
+.close:hover,
+.close:focus {
+    color: black; /* Change color on hover */
+    text-decoration: none; /* Remove underline */
+    cursor: pointer; /* Pointer cursor */
+}
+
+button {
+    margin: 5px; /* Add some margin to buttons */
+    padding: 10px 15px; /* Button padding */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #010048; /* Green background */
+    color: white; /* White text */
+    cursor: pointer; /* Pointer cursor */
+}
+
+button:hover {
+    background-color: #010048; /* Darker green on hover */
+}

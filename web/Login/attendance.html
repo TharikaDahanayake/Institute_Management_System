@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Attendance Sheet</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background-color: white;
+            display: flex;
+            height: 100vh;
+            color: #010048;
+            font-weight: bold;
+        }
+
+        #left-frame {
+            width: 25%;
+            padding: 20px;
+            overflow-y: auto;
+            border: 5px solid #012652;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #right-frame {
+            width: 75%;
+            padding: 20px;
+            overflow: auto; /* Allow vertical and horizontal scrolling */
+            border: 5px solid #012652;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #010048;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            min-width: 800px; /* Ensures horizontal scrolling */
+        }
+
+        #attendance-table th,
+        #attendance-table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        th {
+            background-color: #012652;
+            color: white;
+        }
+
+        td {
+            background-color: #f3f6f4;
+        }
+
+        #report-btn {
+            margin-top: 20px;
+            background-color: #010048;
+        }
+
+        #clear-btn {
+            background-color: #010048;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="left-frame">
+        <h1>Manage Attendance</h1>
+        <form id="attendance-form">
+            <div class="form-group">
+                <label for="classId">Class ID:</label>
+                <input type="text" id="classId" name="classId">
+            </div>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="text" id="date" name="date"> <!-- Changed to input type date -->
+            </div>
+            <button type="button" id="filter-btn">Search</button>
+            <button type="button" id="clear-btn">Clear</button>
+            <button id="report-btn">Generate Report</button>
+        </form>
+    </div>
+
+    <div id="right-frame">
+        <h2>Attendance Records</h2>
+        
+        <table id="attendance-table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Class ID</th>
+                    <th>Date</th>
+                    <th>Time</th>  <!-- Added Time header -->
+                    <th>Attendance</th>
+                </tr>
+            </thead>
+            <tbody id="attendance-body">
+                <!-- Attendance data will be populated here -->
+            </tbody>
+        </table>
+        
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+            authDomain: "admin-website-cc58a.firebaseapp.com",
+            projectId: "admin-website-cc58a",
+            storageBucket: "admin-website-cc58a.appspot.com",
+            messagingSenderId: "1038815370367",
+            appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+    
+        // Function to load attendance records into the table
+        async function loadAttendance(classId = '', date = '') {
+            const attendanceBody = document.getElementById('attendance-body');
+            attendanceBody.innerHTML = ''; // Clear the table body
+    
+            try {
+                let attendanceQuery = collection(db, "attendance");
+    
+                // If classId and date are provided, filter the records
+                if (classId && date) {
+                    attendanceQuery = query(attendanceQuery, where("classId", "==", classId), where("Date", "==", date));
+                }
+    
+                const querySnapshot = await getDocs(attendanceQuery);
+    
+                if (querySnapshot.empty) {
+                    console.log("No attendance records found.");
+                    attendanceBody.innerHTML = '<tr><td colspan="5">No attendance records found</td></tr>';
+                    return;
+                }
+    
+                // Create an object to store the latest record per student for a specific class and date
+                const latestAttendance = {};
+    
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+    
+                    // Filter out rows with null data in important fields
+                    if (!data.StudentID || !data.classId || !data.Date || !data.Time) {
+                        return; // Skip rows with null or missing data
+                    }
+    
+                    const key = `${data.StudentID}-${data.classId}-${data.Date}`; // Unique key to identify duplicates
+    
+                    // If the current record is the latest for this student on this date and class, update it
+                    if (!latestAttendance[key] || data.Time > latestAttendance[key].Time) {
+                        latestAttendance[key] = data; // Store the latest record
+                    }
+                });
+    
+                // Now display only the latest records
+                Object.values(latestAttendance).forEach((data) => {
+                    const row = document.createElement('tr');
+    
+                    const studentIDCell = document.createElement('td');
+                    studentIDCell.textContent = data.StudentID;  // Student ID
+                    row.appendChild(studentIDCell);
+    
+                    const classIDCell = document.createElement('td');
+                    classIDCell.textContent = data.classId;  // Class ID
+                    row.appendChild(classIDCell);
+    
+                    const dateCell = document.createElement('td');
+                    dateCell.textContent = data.Date;  // Date
+                    row.appendChild(dateCell);
+    
+                    const timeCell = document.createElement('td');  // Time cell
+                    timeCell.textContent = data.Time;  // Time
+                    row.appendChild(timeCell);
+    
+                    const attendanceCell = document.createElement('td');
+                    attendanceCell.textContent = data.Attendance || 'Present';  // Attendance
+                    row.appendChild(attendanceCell);
+    
+                    attendanceBody.appendChild(row); // Append the row to the table body
+                });
+    
+            } catch (error) {
+                console.error("Error loading attendance records: ", error);
+            }
+        }
+    
+        // Load attendance records when the page loads
+        loadAttendance();
+    
+        function clearForm() {
+            document.getElementById('attendance-form').reset();
+            document.getElementById('attendance-body').innerHTML = '';
+            loadAttendance(); // Load all records again
+        }
+    
+        // Function to filter attendance records by Class ID and Date
+        async function filterAttendance() {
+            const classId = document.getElementById('classId').value.trim();
+            const date = document.getElementById('date').value.trim(); // Updated to match the input ID
+            await loadAttendance(classId, date);
+        }
+    
+        // Function to generate a CSV report
+        function generateReport() {
+            const rows = document.querySelectorAll('#attendance-body tr');
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Student ID,Class ID,Date,Time,Attendance\n";
+    
+            rows.forEach((row) => {
+                const columns = row.querySelectorAll('td');
+                if (columns.length > 0) {
+                    const rowData = Array.from(columns).map(col => col.textContent).join(',');
+                    csvContent += rowData + "\n";
+                }
+            });
+    
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "attendance_report.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    
+        document.getElementById('filter-btn').addEventListener('click', filterAttendance);
+        document.getElementById('clear-btn').addEventListener('click', clearForm);
+        document.getElementById('report-btn').addEventListener('click', generateReport);
+    </script>
+    
+</body>
+</html>

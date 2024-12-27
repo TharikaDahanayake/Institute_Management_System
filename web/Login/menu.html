@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="styles2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Menu</title>
+    <script>
+        function hideAllSubMenus() {
+            var subMenus = document.querySelectorAll('ul[id$="SubMenu"]');
+            subMenus.forEach(function(menu) {
+                menu.style.display = 'none';
+            });
+        }
+        function handleMainTabClick(menuId) {
+            var subMenu = document.getElementById(menuId);
+
+            // If a submenu is associated with the clicked tab
+            if (subMenu) {
+                // Check if the submenu is already visible
+                if (subMenu.style.display === 'block') {
+                    subMenu.style.display = 'none'; // Hide if it's visible
+                } else {
+                    hideAllSubMenus(); // Hide all submenus
+                    subMenu.style.display = 'block'; // Show the clicked submenu
+                }
+            } else {
+                hideAllSubMenus(); // Hide all submenus if no submenu is associated
+            }
+        }
+    
+        // Functions to handle logout modal
+        function confirmLogout(event) {
+            event.preventDefault(); // Prevent the default logout link action
+            var warningModal = document.getElementById("warningModal");
+            warningModal.style.display = "block";
+        }
+    
+        function closeModal() {
+            var warningModal = document.getElementById("warningModal");
+            warningModal.style.display = "none";
+        }
+    
+        function logout() {
+            window.top.location.href = "login.html"; // Redirect to the login page
+        }
+    </script>
+</head>
+<body>
+    <div class="menu">
+        <ul>
+            <li><img src="C:\Users\thari\Downloads\edusync-high-resolution-logo-white-transparent.png" height="100px" width="140px"></li>
+            <li><a href="dashboard.html" target="contentFrame" onclick="handleMainTabClick()"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+
+            <li><a href="#" onclick="handleMainTabClick('studentSubMenu')"><i class="fas fa-user-graduate"></i> Student</a>
+                <ul id="studentSubMenu" style="display:none;">
+                    <li><a href="allStudentDetails.html" target="contentFrame"><i class="fas fa-list"></i> All Students Details</a></li>
+                    <li><a href="studentdetails.html" target="contentFrame"><i class="fas fa-user"></i> Student Details</a></li>
+                    <li><a href="studentRequest.html" target="contentFrame"><i class="fas fa-clock"></i> Pending Student Request</a></li>
+                </ul>
+            </li>
+
+            <li><a href="#" onclick="handleMainTabClick('teacherSubMenu')"><i class="fas fa-chalkboard-teacher"></i> Teacher</a>
+                <ul id="teacherSubMenu" style="display:none;">
+                    <li><a href="allTeacherDetails.html" target="contentFrame"><i class="fas fa-list"></i> All Teacher Details</a></li>
+                    <li><a href="teacherRegistration.html" target="contentFrame"><i class="fas fa-user-plus"></i> Teacher Registration</a></li>
+                    <li><a href="teacherDetails.html" target="contentFrame"><i class="fas fa-user"></i> Teacher Details</a></li>
+                </ul>
+            </li>
+
+            <li><a href="allParent.html" target="contentFrame" onclick="handleMainTabClick()"><i class="fas fa-user-friends"></i> Parent</a></li>
+            <li><a href="subject.html" target="contentFrame" onclick="handleMainTabClick()"><i class="fas fa-book"></i> Subject</a></li>
+
+            <li><a href="#" onclick="handleMainTabClick('ClassSubMenu')"><i class="fas fa-building"></i> Class</a>
+                <ul id="ClassSubMenu" style="display:none;">
+                    <li><a href="class.html" target="contentFrame"><i class="fas fa-plus-circle"></i> Create Class</a></li>
+                    <li><a href="zoomlink.html" target="contentFrame"><i class="fas fa-video"></i> Zoom Link</a></li>
+                    <li><a href="classEnroll.html" target="contentFrame"><i class="fas fa-list-alt"></i> Class Enrollment Details</a></li>
+                </ul>
+            </li>
+
+            <li><a href="attendance.html" target="contentFrame" onclick="handleMainTabClick()"><i class="fas fa-calendar-check"></i> Attendance</a></li>
+
+            <li><a href="#" onclick="handleMainTabClick('PaymentSubMenu')"><i class="fas fa-credit-card"></i> Payment</a>
+                <ul id="PaymentSubMenu" style="display:none;">
+                    
+                    <li><a href="allStudentPayment.html" target="contentFrame"><i class="fas fa-list"></i> Student Payment</a></li>
+                    <li><a href="teacherPayment.html" target="contentFrame"><i class="fas fa-dollar-sign"></i> Teacher Payment</a></li>
+                </ul>
+            </li>
+
+            <li><a href="notice.html" target="contentFrame" onclick="handleMainTabClick()"><i class="fas fa-bell"></i> Notice</a></li>
+            <li><a href="aboutUs.html" target="contentFrame" onclick="handleMainTabClick()"><i class="fas fa-info-circle"></i> About Us</a></li>
+            <li><a href="Login.html" onclick="confirmLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Modal for logout confirmation -->
+    <div id="warningModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p>Are you sure you want to log out?</p>
+            <button id="confirmLogout" onclick="logout()">Yes</button>
+            <button id="cancelLogout" onclick="closeModal()">No</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice Management</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            height: 100vh;
+            justify-content: space-between;
+            background-color: white; 
+            background-size: cover;
+            color:  #010048; /* Set text color to white */
+            font-weight: bold;
+        }
+
+        .frame-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .left, .right {
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .left {
+            width: 35%;
+            border: 5px solid #012652;
+            color: white;
+            border-right: 1px solid #ccc;
+        }
+
+        .right {
+            width: 65%;
+            border: 5px solid #012652;
+            color: white;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color:black; /* Change heading text color to white */
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color:#010048 ; /* Change heading text color to white */
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .form-actions .save-btn,
+        .form-actions .clear-btn {
+            background-color: #010048; /* Blue background color */
+        }
+
+        .notice {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            color: black; /* Set text color to black */
+        }
+
+        .notice h3 {
+            margin-top: 0;
+        }
+
+        .notice p {
+            margin: 5px 0;
+        }
+
+        .notice span {
+            display: block;
+            color: #555; /* Change to a darker shade of grey for better visibility */
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="frame-container">
+        <div class="left">
+            <h2>Create Notice</h2>
+    
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="details">Details:</label>
+                <textarea id="details" rows="4" autocomplete="off"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="postedBy">Posted By:</label>
+                <input type="text" id="postedBy" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" autocomplete="off">
+            </div>
+            <div class="form-actions">
+                <button type="button" id="clear-btn" class="clear-btn" onclick="clearForm()">Clear</button>
+                <button type="button" id="save-btn" class="save-btn" onclick="saveNotice()">Save</button>
+               
+            </div>
+        </div>
+    
+        <div class="right">
+            <h2>Notices</h2>
+            <div id="noticeContainer">
+                <!-- Notices will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Import the necessary functions from the Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+            authDomain: "admin-website-cc58a.firebaseapp.com",
+            projectId: "admin-website-cc58a",
+            storageBucket: "admin-website-cc58a.appspot.com",
+            messagingSenderId: "1038815370367",
+            appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to clear the form fields
+        function clearForm() {
+            document.getElementById('title').value = '';
+            document.getElementById('details').value = '';
+            document.getElementById('postedBy').value = '';
+            document.getElementById('date').value = '';
+        }
+        window.clearForm = clearForm;
+
+        // Function to save a new notice to Firestore
+        async function saveNotice() {
+            const title = document.getElementById('title').value.trim();
+            const details = document.getElementById('details').value.trim();
+            const postedBy = document.getElementById('postedBy').value.trim();
+            const date = document.getElementById('date').value;
+
+            if (!title || !details || !postedBy || !date) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "notices"), {
+                    Title: title,
+                    Details: details,
+                    PostedBy: postedBy,
+                    Date: date
+                });
+                alert("Notice saved successfully!");
+                clearForm();
+                loadNotices(); // Load notices after saving
+            } catch (error) {
+                console.error("Error adding notice: ", error);
+            }
+        }
+        window.saveNotice = saveNotice;
+
+        // Function to load notices into the page
+        async function loadNotices() {
+            const noticeContainer = document.getElementById('noticeContainer');
+            noticeContainer.innerHTML = ''; // Clear the container
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "notices"));
+
+                querySnapshot.forEach((doc) => {
+                    const noticeData = doc.data();
+                    const noticeDiv = document.createElement('div');
+                    noticeDiv.className = 'notice';
+                    noticeDiv.innerHTML = `
+                        <h3>${noticeData.Title}</h3>
+                        <p>${noticeData.Details}</p>
+                        <span>Posted by: ${noticeData.PostedBy}</span>
+                        <span>Date: ${new Date(noticeData.Date).toLocaleDateString()}</span>
+                    `;
+                    noticeContainer.appendChild(noticeDiv);
+                });
+            } catch (error) {
+                console.error("Error loading notices: ", error);
+            }
+        }
+
+        // Load notices when the page loads
+        loadNotices();
+    </script>
+</body>
+</html>

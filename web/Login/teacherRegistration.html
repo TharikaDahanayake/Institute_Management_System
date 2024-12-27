@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Details Form</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #d6d6d6;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-size: cover;
+            color: #010048;
+        }
+
+        .container {
+            width: 60%;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 10px solid #010048;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #010048;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #010048;
+        }
+
+        input,
+        textarea,
+        select {
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #010048;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button[type="reset"] {
+            background-color: #010048;
+        }
+
+        button[type="reset"]:hover {
+            background-color: #0056b3;
+        }
+
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        .gender-options {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .gender-options input {
+            margin-right: 5px;
+        }
+
+        .gender-options label {
+            margin-right: 15px;
+        }
+
+        #errorMsg {
+            color: red;
+            display: none;
+        }
+
+        #formError {
+            color: red;
+            display: none;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Teacher Registration</h1>
+        <form id="teacherForm">
+            <span id="formError">Please fill all the fields before submitting.</span>
+
+            <label for="teacherID">Teacher ID:</label>
+            <input type="text" id="teacherID" name="teacherID" placeholder="Te/xx/xxxx" required>
+            <span id="errorMsg">Teacher ID must start with Te/xx/xxxx format.</span>
+
+            <label for="nic">NIC:</label>
+            <input type="text" id="nic" name="nic" required>
+
+            <label for="fname">First Name:</label>
+            <input type="text" id="fname" name="fname" required>
+
+            <label for="lname">Last Name:</label>
+            <input type="text" id="lname" name="lname" required>
+
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required>
+
+            <label for="gender">Gender:</label>
+            <div class="gender-options">
+                <input type="radio" id="male" name="gender" value="Male">
+                <label for="male">Male</label>
+                <input type="radio" id="female" name="gender" value="Female">
+                <label for="female">Female</label>
+            </div>
+
+            <label for="stream">Stream:</label>
+            <select id="stream" name="stream" required>
+                <option value="">Select Stream</option>
+            </select>
+
+            <label for="subjectName">Subject Name:</label>
+            <select id="subjectName" name="subjectName" required>
+                <option value="">Select Subject</option>
+            </select>
+
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" required></textarea>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="telephone">Telephone Number:</label>
+            <input type="tel" id="telephone" name="telephone" required>
+
+            <label for="password">Password:</label>
+            <div class="password-container">
+                <input type="password" id="password" name="password" required>
+                <span class="toggle-password">👁</span>
+            </div>
+
+            <label for="qualification">Qualification:</label>
+            <textarea id="qualification" name="qualification" required></textarea>
+
+            <div class="form-buttons">
+                <button type="reset">Clear</button>
+                <button type="button" id="registerBtn">Register</button>
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query,where, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX-suYFhRF6svCQaRXEXIFs2EF4SN_-Ag",
+            authDomain: "admin-website-cc58a.firebaseapp.com",
+            projectId: "admin-website-cc58a",
+            storageBucket: "admin-website-cc58a.appspot.com",
+            messagingSenderId: "1038815370367",
+            appId: "1:1038815370367:web:27be85a2304aef6056b34a"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+    
+        // Teacher ID validation
+        document.getElementById("registerBtn").addEventListener("click", async function(event) {
+            const teacherID = document.getElementById("teacherID").value.trim();
+            const errorMsg = document.getElementById("errorMsg");
+            const formError = document.getElementById("formError");
+    
+            const pattern = /^Te\/\d{2}\/\d{4}$/;
+            if (!pattern.test(teacherID)) {
+                errorMsg.style.display = "block";
+                return;
+            } else {
+                errorMsg.style.display = "none";
+            }
+    
+            // Fetch form data
+            const nic = document.getElementById("nic").value.trim();
+            const fname = document.getElementById("fname").value.trim();
+            const lname = document.getElementById("lname").value.trim();
+            const age = document.getElementById("age").value.trim();
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+            const stream = document.getElementById("stream").value.trim();
+            const subjectName = document.getElementById("subjectName").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const telephone = document.getElementById("telephone").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const qualification = document.getElementById("qualification").value.trim();
+    
+            // Check if any field is empty
+            if (!teacherID || !nic || !fname || !lname || !age || !gender || !stream || !subjectName || !address || !email || !telephone || !password || !qualification) {
+                formError.style.display = "block";
+                alert("All fields must be filled!");
+                return;
+            } else {
+                formError.style.display = "none";
+            }
+    
+
+              // Check if the subjectName matches the selected stream
+    if (!await isSubjectValidForStream(subjectName, stream)) {
+        alert("The selected subject does not match the selected stream.");
+        return;
+    }
+
+    const nameRegex = /^[A-Za-z]+$/;
+
+// Validate student's first name
+if (!nameRegex.test(fname)) {
+  alert('Please enter a valid first name for teacher!');
+  return false;
+}
+
+// Validate student's last name
+if (!nameRegex.test(lname)) {
+  alert('Please enter a valid last name for teacher!');
+  return false;
+}
+
+            // Check if the phone number matches the regex pattern
+    if (!validateTelephone(telephone)) {
+        alert("Please enter a valid phone number !");
+        return;
+    }
+
+    if (!validateAge(age)) {
+    alert("Please enter a valid age between 25 and 65.");
+    return;
+}
+
+    if (!validateEmail(email)) {
+    alert("Please enter a valid email address that starts with a letter and ends with @gmail.com!");
+    return;
+}
+
+            // Password validation
+            if (!validatePassword(password)) {
+                alert("Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.");
+                return;
+            }
+
+            // Check if the teacher ID already exists in Firestore
+            const teacherRef = collection(db, "teachers");
+            const q = query(teacherRef, where("teacherID", "==", teacherID));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                alert("This teacher ID already exists! Please use a different teacher ID.");
+                return;
+            }
+    
+            // Save to Firestore
+            try {
+                await addDoc(collection(db, "teachers"), {
+                    teacherID: teacherID,
+                    nic: nic,
+                    fname: fname,
+                    lname: lname,
+                    age: age,
+                    gender: gender,
+                    stream: stream,
+                    subjectName: subjectName,
+                    address: address,
+                    email: email,
+                    telephone: telephone,
+                    password: password,
+                    qualification: qualification
+                });
+                alert("Teacher registered successfully!");
+            } catch (error) {
+                console.error("Error adding teacher:", error);
+            }
+        });
+
+        // Function to validate if the selected subject matches the selected stream
+async function isSubjectValidForStream(subjectName, stream) {
+    try {
+        const subjectsRef = collection(db, "subjects");
+        const q = query(subjectsRef, where("Stream", "==", stream), where("SubjectName", "==", subjectName));
+        const querySnapshot = await getDocs(q);
+
+        // If the query returns results, it means the subject matches the stream
+        return !querySnapshot.empty;
+    } catch (error) {
+        console.error("Error validating subject and stream: ", error);
+        return false;
+    }
+}
+
+
+        function validateTelephone(telephone) {
+    // Regular expression to check if the input contains exactly 10 digits
+    const telephonePattern = /^\d{10}$/;
+    return telephonePattern.test(telephone);
+        }
+
+        // Age validation function
+function validateAge(age) {
+    const agePattern = /^[1-9][0-9]?$/; // Matches ages from 1 to 99
+    if (!agePattern.test(age)) {
+        return false; // Age must be a valid number
+    }
+
+    const ageValue = parseInt(age, 10);
+    return ageValue >= 25 && ageValue <= 65; // Age must be between 18 and 100
+}
+        
+        // Password validation function
+        function validatePassword(password) {
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            return passwordPattern.test(password);
+        }
+
+                // Email validation function
+        function validateEmail(email) {
+            const emailPattern = /^[a-zA-Z][a-zA-Z0-9._%+-]*@gmail\.com$/;
+            return emailPattern.test(email);
+        }
+    
+        // Toggle password visibility
+        const togglePassword = document.querySelector(".toggle-password");
+        const passwordInput = document.getElementById("password");
+        togglePassword.addEventListener("click", function() {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+            } else {
+                passwordInput.type = "password";
+            }
+        });
+    
+        // Fetch and populate streams and subjects from Firestore
+        async function populateDropdowns() {
+            const streamSelect = document.getElementById("stream");
+            const subjectSelect = document.getElementById("subjectName");
+    
+            try {
+                // Fetch subjects collection
+                const subjectsSnapshot = await getDocs(collection(db, "subjects"));
+    
+                // Create sets to avoid duplicate stream entries
+                const streamsSet = new Set();
+    
+                subjectsSnapshot.forEach(doc => {
+                    const data = doc.data();
+    
+                    // Add unique stream names to the set
+                    if (data.Stream) {
+                        streamsSet.add(data.Stream);
+                    }
+    
+                    // Add subject names to the subject dropdown
+                    if (data.SubjectName) {
+                        const subjectOption = document.createElement("option");
+                        subjectOption.value = data.SubjectName;
+                        subjectOption.textContent = data.SubjectName;
+                        subjectSelect.appendChild(subjectOption);
+                    }
+                });
+    
+                // Populate the stream dropdown from the streams set
+                streamsSet.forEach(stream => {
+                    const streamOption = document.createElement("option");
+                    streamOption.value = stream;
+                    streamOption.textContent = stream;
+                    streamSelect.appendChild(streamOption);
+                });
+    
+            } catch (error) {
+                console.error("Error fetching streams and subjects: ", error);
+            }
+        }
+    
+        // Call function to populate streams and subjects
+        populateDropdowns();
+    </script>
+</body>
+
+</html>
