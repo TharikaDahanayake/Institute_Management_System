@@ -1,16 +1,46 @@
-# flutter_application_1
+# Institute Management System
 
-A new Flutter project.
+## Everyday is a learning day !
 
-## Getting Started
+The Institute Management System (IMS) is a web and mobile application designed to streamline the administrative and academic activities of educational institutions. In an institute management system we can find users such as admin, student, teacher and parent.
+Website is developped for the admin and mobile application is developped for the students, teacher and parents. 
+It provides tools for managing students, teachers, parents, attendance, classes, subjects, payments, and more, using a centralized system.
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- User Roles: Admin, Student, Teacher, Parent
+- Student Management: Registration, login, attendance tracking, payment tracking
+- Teacher Management: Registration, login, subject assignment, class scheduling
+- Parent Involvement: Attendance monitoring, payment updates, communication with teacher
+- Class Management: Scheduling, attendance, and class details
+- Subject Management: Adding, deleting, updating, and listing subjects
+- Notices and Announcements: Viewing, creating notices
+- Payment Processing: Fee management and tracking, updating payment status (paid, not paid)
+- E-learning: Access to tutorials, lecture recordings, and assignments
+- Communication Tools: Chat functionality and notifications
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Technologies Used
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Web Application
+
+- Frontend: HTML, CSS, JavaScript
+- Backend: Firebase
+
+### Mobile Application
+
+- Framework: Flutter
+- Database: Firebase
+- Tools: Visual Studio
+
+## Installation and Setup
+
+### Prerequisites
+
+- Firebase account
+- Flutter SDK
+- Visual Studio Code
+
+#### Thank You Guys & Good Luck!!
+
+Best Regards,
+**_Tharika Dahanayake_**
